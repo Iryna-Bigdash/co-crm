@@ -3,6 +3,7 @@ import React from 'react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import LogoUploader from './logo-uploader';
 import InputField from './input-field';
+import Button from './button';
 
 export type CompanyFieldValues = {
   title: string;
@@ -45,11 +46,13 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
         <div className='flex flex-col flex-1 gap-5'>
             <InputField  label='Name' placeholder='Title' name='title'/>
             <InputField  label='Category' placeholder='Category' name='category'/>
-            <InputField  label='Joined data' placeholder='Joined data' name='joinedData'/>
+            <InputField  label='Joined data' placeholder='Joined data' type="date" name='joinedData'/>
             <InputField  label='Description' placeholder='Description' name='description'/>
         </div>
         </div>
-
+        <Button type="submit">
+          Add company
+        </Button>
       </Form>
     </Formik>
   );
