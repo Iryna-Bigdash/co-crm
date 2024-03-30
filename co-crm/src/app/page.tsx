@@ -1,11 +1,12 @@
 import AddCompanyButton from './components/add-company-button';
-import StatusLabel, { Status } from './components/status-label';
+import MagicButton from './components/magic-button';
 
 export default function Home() {
   return (
     <main>
-      <h1 className="text-amber-500">Hello</h1>
-    <AddCompanyButton/>
+      <h1 className="text-amber-500">Home Page</h1>
+    <AddCompanyButton />
+    <MagicButton />
     </main>
   );
 }
