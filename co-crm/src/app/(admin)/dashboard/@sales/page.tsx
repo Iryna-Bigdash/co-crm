@@ -1,14 +1,40 @@
 import React from 'react';
-import { getSummarySales } from '@/lib/api';
 import SummaryTableCell from '@/app/components/summary-table-cell';
 import SummaryTableHeader from '@/app/components/summary-table-header';
 import SummaryTable from '@/app/components/summary-table';
 import DashboardCard from '@/app/components/dashboard-card';
 
+const getRandomNumber = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+const getRandomCompanyTitle = () => {
+  const companies = [
+    'Company A',
+    'Company B',
+    'Company C',
+    'Company D',
+    'Company E',
+  ];
+  return companies[getRandomNumber(0, companies.length - 1)];
+};
+
+const generateRandomSalesData = (count: number) => {
+  const salesData = [];
+  for (let i = 0; i < count; i++) {
+    const companyId = `company_${i}`;
+    const companyTitle = getRandomCompanyTitle();
+    const sold = getRandomNumber(100, 1000);
+    const income = getRandomNumber(1000, 10000);
+    salesData.push({ companyId, companyTitle, sold, income });
+  }
+  return salesData;
+};
+
 export interface PageProps {}
 
-export default async function Page({}: PageProps) {
-  const data = await getSummarySales();
+const Page: React.FC<PageProps> = () => {
+  const data = generateRandomSalesData(6);
 
   return (
     <DashboardCard label="Sales details">
@@ -31,4 +57,6 @@ export default async function Page({}: PageProps) {
       </SummaryTable>
     </DashboardCard>
   );
-}
+};
+
+export default Page;
