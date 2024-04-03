@@ -6,7 +6,7 @@ export interface SummaryStats {
 }
 
 export interface SummarySales {
-  // id: string;
+  id: string;
   companyId: string;
   companyTitle: string;
   sold: number;
@@ -14,12 +14,12 @@ export interface SummarySales {
 }
 
 export interface Country {
-  // id: string;
+  id: string;
   title: string;
 }
 
 export interface Category {
-  // id: string;
+  id: string;
   title: string;
 }
 
@@ -31,7 +31,7 @@ export enum CompanyStatus {
 }
 
 export interface Company {
-  // id: string;
+  id: string;
   title: string;
   description: string;
   status: CompanyStatus;
@@ -45,7 +45,7 @@ export interface Company {
 }
 
 export interface Promotion {
-  // id: string;
+  id: string;
   title: string;
   description: string;
   discount: number;
