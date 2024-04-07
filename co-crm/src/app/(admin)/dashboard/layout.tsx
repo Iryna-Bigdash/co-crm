@@ -6,7 +6,7 @@ export interface LayoutProps {
   sales: React.ReactNode;
   categories: React.ReactNode;
   countries: React.ReactNode;
-  // promotions: React.ReactNode;
+  promotions: React.ReactNode;
 }
 
 export default function Layout({
@@ -15,7 +15,7 @@ export default function Layout({
   sales,
   categories,
   countries,
-  // promotions,
+  promotions,
 }: LayoutProps) {
   return (
     <div>
@@ -25,7 +25,7 @@ export default function Layout({
         <div className="col-span-5">{sales}</div> 
         <div className="col-span-7">{categories}</div>
         <div className="col-span-6">{countries}</div>
-        {/* <div className="col-span-6">{promotions}</div>  */}
+        <div className="col-span-6">{promotions}</div> 
       </main>
     </div>
   );
