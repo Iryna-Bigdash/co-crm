@@ -1,9 +1,32 @@
 import React from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
-import { getCompanies, getCountries } from '@/lib/api';
+// import { getCompanies, getCountries } from '@/lib/api';
 import getCountById from '@/lib/utils/getCountById';
 import DashboardCard from '@/app/components/dashboard-card';
+
+const getCountries = () => {
+  const countries = [
+    { id: 'cant1', title: 'Canada' },
+    { id: 'cant2', title: 'USA' },
+    { id: 'cant3', title: 'Italy' },
+    { id: 'cant4', title: 'Ukraine' },
+    { id: 'cant5', title: 'Spain' },
+  ];
+  return countries;
+};
+
+const getCompanies = () => {
+  const companies = [];
+  const countries = getCountries();
+  for (const country of countries) {
+    const numCompanies = Math.floor(Math.random() * 10) + 1; // Випадкова кількість компаній від 1 до 10
+    for (let i = 1; i <= numCompanies; i++) {
+      companies.push({ id: `company_${i}`, countryId: country.id });
+    }
+  }
+  return companies;
+};
 
 
 export interface PageProps {}
