@@ -6,10 +6,8 @@ export interface PageProps {}
 export default function Page({}: PageProps) {
   return (
     <>
-      <Header>Dashboard</Header>
-      <div>
-        <MagicButton />
-      </div>
+      <Header>Dashboard/New Companies</Header>
+     <p>Some additional information about new companies</p>
     </>
   );
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import StatCard, { StatCardType } from '@/app/components/stat-card';
 import { SummaryStats } from '@/lib/api';
 import { faker } from '@faker-js/faker';
+import Link from 'next/link';
 
 export interface PageProps {}
 
@@ -27,13 +28,13 @@ const Page: React.FC<PageProps> = () => {
   return (
     <div className="grid grid-cols-12 gap-5">
       {(Object.keys(labelByStat) as (keyof SummaryStats)[]).map((key) => (
-        <div key={key} className="col-span-3">
+        <Link href={`dashboard/${key}`}  key={key} className="col-span-3">
           <StatCard
             type={StatCardType.Gradient}
             label={labelByStat[key]}
             counter={data[key]}
           />
-        </div>
+        </Link>
       ))}
     </div>
   );
