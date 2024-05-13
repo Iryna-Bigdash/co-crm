@@ -1,7 +1,5 @@
 import Sidebar from '@/app/components/sidebar';
 import React from 'react';
-import MagicButton from '../components/magic-button';
-
 export interface LayoutProps {
   children: React.ReactNode;
 }

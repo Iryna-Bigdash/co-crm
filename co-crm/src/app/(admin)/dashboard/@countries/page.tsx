@@ -39,6 +39,7 @@ export default async function Page({}: PageProps) {
 
   return (
     <DashboardCard label="Countries of companies">
+      <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
       <div className="flex items-end pb-5 px-5 gap-2">
         <div>
           {countries.map(({ id, title }) => (
@@ -52,6 +53,7 @@ export default async function Page({}: PageProps) {
           ))}
         </div>
         <Image width={395} height={262} src="/images/world.svg" alt="world" />
+      </div>
       </div>
     </DashboardCard>
   );

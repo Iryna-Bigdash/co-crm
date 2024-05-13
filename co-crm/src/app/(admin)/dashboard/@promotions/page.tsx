@@ -17,7 +17,7 @@ export interface PageProps {}
 const getPromotions = (): Promotion[] => {
   const data: Promotion[] = [];
 
-  for (let i = 1; i <= 7; i++) {
+  for (let i = 1; i <= 17; i++) {
     data.push({
       id: `promo_${i}`,
       title: `Promotion ${i}`,
@@ -34,6 +34,7 @@ export default async function Page({}: PageProps) {
 
   return (
     <DashboardCard label="Promotions">
+      <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
       <SummaryTable
         headers={
           <>
@@ -51,6 +52,7 @@ export default async function Page({}: PageProps) {
           </tr>
         ))}
       </SummaryTable>
+      </div>
     </DashboardCard>
   );
 }
