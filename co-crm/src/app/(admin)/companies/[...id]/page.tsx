@@ -33,7 +33,6 @@ export default function Page({ params }: PageProps) {
   return (
     <>
       <Header>Companies {params.id ? (Array.isArray(params.id) ? params.id.join(', ') : params.id) : 'undefined'}</Header>
-      <p>{new Date().toTimeString()}</p>
     </>
   );
 }

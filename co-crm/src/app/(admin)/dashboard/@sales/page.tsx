@@ -9,7 +9,13 @@ const getRandomNumber = (min: number, max: number) => {
 };
 
 const getRandomCompanyTitle = () => {
-  const companies = ['Company A', 'Company B', 'Company C', 'Company D', 'Company E'];
+  const companies = [
+    'Company A',
+    'Company B',
+    'Company C',
+    'Company D',
+    'Company E',
+  ];
   return companies[getRandomNumber(0, companies.length - 1)];
 };
 
@@ -25,10 +31,13 @@ const generateRandomSalesData = (count: number) => {
   return salesData;
 };
 
-export interface PageProps {}
+export const getData = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 4000));
+  return generateRandomSalesData(16);
+};
 
-const Page: React.FC<PageProps> = () => {
-  const data = generateRandomSalesData(16); 
+const Page = async () => {
+  const data = await getData();
 
   return (
     <DashboardCard label="Sales details">
@@ -56,7 +65,3 @@ const Page: React.FC<PageProps> = () => {
 };
 
 export default Page;
-
-
-
-
