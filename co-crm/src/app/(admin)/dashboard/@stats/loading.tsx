@@ -1,11 +1,9 @@
+import Loader from '@/app/components/loader';
 import React from 'react';
-
 export interface LoadingProps {}
 
-export default function Loading({}: LoadingProps) {
-  return (
-    <div>
-      <p>Loading..</p>
-    </div>
-  );
+const Loading: React.FC<LoadingProps> = () => {
+  return <Loader />;
 }
+
+export default Loading;
