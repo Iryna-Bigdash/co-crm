@@ -3,7 +3,7 @@ import DashboardCard from '@/app/components/dashboard-card';
 import SummaryTable from '@/app/components/summary-table';
 import SummaryTableCell from '@/app/components/summary-table-cell';
 import SummaryTableHeader from '@/app/components/summary-table-header';
-// import { getPromotions } from '@/lib/api';
+import { getPromotions } from '@/lib/api';
 
 export interface Promotion {
   id: string;
@@ -13,21 +13,6 @@ export interface Promotion {
 }
 
 export interface PageProps {}
-
-const getPromotions = (): Promotion[] => {
-  const data: Promotion[] = [];
-
-  for (let i = 1; i <= 17; i++) {
-    data.push({
-      id: `promo_${i}`,
-      title: `Promotion ${i}`,
-      companyTitle: `Company ${i}`,
-      discount: Math.floor(Math.random() * 50) + 1,
-    });
-  }
-
-  return data;
-};
 
 export default async function Page({}: PageProps) {
   const data = await getPromotions();
