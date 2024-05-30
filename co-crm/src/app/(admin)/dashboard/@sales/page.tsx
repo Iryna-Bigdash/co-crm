@@ -8,7 +8,6 @@ import DashboardCard from '@/app/components/dashboard-card';
 export interface PageProps {}
 
 export default async function Page({}: PageProps) {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   const data = await getSummarySales();
 
