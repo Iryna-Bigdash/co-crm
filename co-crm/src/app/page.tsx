@@ -1,11 +1,19 @@
-import AddCompanyButton from "./components/add-company-button";
+import React from 'react';
+import Image from 'next/image';
 
 export default function Home() {
   return (
-    <main>
-      <h1 className="text-amber-500">Home Page</h1>
-      <p>Login</p>
-      <AddCompanyButton />
+    <main className="bg-slate-800 min-h-screen flex flex-col items-center justify-center">
+      <Image
+          className="py-8 mb-11 mx-auto"
+          width={350}
+          height={185}
+          src="/icons/logo.svg"
+          alt="logo"
+        />
+      {/* <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl mb-4">TruScape</h1> */}
+      {/* <p className="text-lg">Login</p> */}
     </main>
   );
 }
+
