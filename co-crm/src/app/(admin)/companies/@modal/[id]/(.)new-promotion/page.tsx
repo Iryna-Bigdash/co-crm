@@ -3,7 +3,7 @@
 import React from 'react';
 import CompanyForm from '@/app/components/company-form';
 import Modal from '@/app/components/modal';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export interface PageProps {}
 
