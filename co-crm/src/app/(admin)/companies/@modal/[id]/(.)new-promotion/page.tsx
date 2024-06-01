@@ -1,18 +1,20 @@
 'use client';
 
 import React from 'react';
-import CompanyForm from '@/app/components/company-form';
-import Modal from '@/app/components/modal';
 import { useRouter } from 'next/navigation';
+import PromotionFormModal from '@/app/components/promotion-form-modal';
 
-export interface PageProps {}
+export interface PageProps {
+  params: { id: string };
+}
 
-export default function Page({}: PageProps) {
+export default function Page({ params }: PageProps) {
   const router = useRouter();
-
   return (
-    <Modal show={true} onClose={() => router.back()}>
-      <CompanyForm onSubmit={console.log} />
-    </Modal>
+    <PromotionFormModal
+      companyId={params.id}
+      show={true}
+      onClose={() => router.back()}
+    />
   );
 }
