@@ -21,10 +21,3 @@ export default function Button({ disabled, ...rest }: ButtonProps) {
   );
 }
 
-// import React from 'react';
-
-// export interface FilenameProps {}
-
-// export default function Filename({}: FilenameProps) {
-//   return <div></div>;
-// }
