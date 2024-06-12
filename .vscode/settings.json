@@ -2,6 +2,10 @@
     "cSpell.words": [
         "clsx",
         "Formik",
+        "tailwindcss",
         "tanstack"
+    ],
+    "cSpell.ignoreWords": [
+        "lucide"
     ]
 }
