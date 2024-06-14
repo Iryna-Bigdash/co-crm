@@ -4,16 +4,12 @@ import React from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import SidebarItem from './sidebar-item';
+import { signOut } from 'next-auth/react';
 
 export interface SidebarProps {}
 
 export default function Sidebar({}: SidebarProps) {
-  const router = useRouter();
   const pathname = usePathname();
-
-  const handleExitClick = () => {
-    router.push('/');
-  };
 
   return (
     <aside className="fixed top-0 left-0 z-40 w-60 h-screen">
@@ -45,7 +41,7 @@ export default function Sidebar({}: SidebarProps) {
         </ul>
         <button
           className="flex items-center gap-2 p-6 mt-auto mx-auto"
-          onClick={handleExitClick}
+          onClick={() => signOut()}
         >
           <Image
             width={18}
