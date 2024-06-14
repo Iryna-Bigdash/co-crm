@@ -13,7 +13,6 @@ export default function Home() {
           src="/icons/logo.svg"
           alt="logo"
         />
-      {/* <h1 className="animate-slide text-3xl font-bold tracking-tight text-white sm:text-5xl">CRM system for your business</h1> */}
       <Greeting />
       <Link href="/dashboard" className="text-lg text-white sm:text-3xl">Login</Link>
     </main>

@@ -3,6 +3,12 @@ import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
 export const options: NextAuthOptions = {
+  theme: {
+    colorScheme:  "dark",
+    brandColor: "#E9D5FF", // Hex color code
+    logo: "/icons/logo.svg", // Absolute URL to image
+    buttonText: "#E9D5FF" // Hex color code
+  },
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID as string,
