@@ -1,16 +1,28 @@
 import { NextAuthOptions } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { GithubProfile } from 'next-auth/providers/github';
+import { Session } from 'inspector';
 
 export const options: NextAuthOptions = {
   theme: {
-    colorScheme:  "dark",
-    brandColor: "#E9D5FF", // Hex color code
-    logo: "/icons/logo.svg", // Absolute URL to image
-    buttonText: "#E9D5FF" // Hex color code
+    colorScheme: 'dark',
+    brandColor: '#E9D5FF', // Hex color code
+    logo: '/icons/logo.svg', // Absolute URL to image
+    buttonText: '#E9D5FF', // Hex color code
   },
   providers: [
     GitHubProvider({
+      profile(profile: GithubProfile) {
+        console.log(profile);
+        return {
+          ...profile,
+          role: profile.role ?? 'user',
+          id: profile.id.toString(),
+          image: profile.avatar_url,
+          email: profile.email,
+        };
+      },
       clientId: process.env.GITHUB_ID as string,
       clientSecret: process.env.GITHUB_SECRET as string,
     }),
@@ -36,6 +48,7 @@ export const options: NextAuthOptions = {
           id: '28',
           name: 'Iryna',
           password: '123456Ira',
+          role: 'admin',
         };
 
         if (
@@ -49,4 +62,15 @@ export const options: NextAuthOptions = {
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) token.role = user.role;
+      return token;
+    },
+    // if you want to use role in client components:
+    async session({ session, token }) {
+      if (session?.user) session.user.role = token.role;
+      return session;
+    },
+  },
 };
