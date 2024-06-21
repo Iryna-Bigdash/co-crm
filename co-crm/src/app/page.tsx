@@ -14,7 +14,7 @@ export default function Home() {
           alt="logo"
         />
       <Greeting />
-      <Link href="/dashboard" className="text-lg text-white sm:text-3xl">Login</Link>
+      <Link href="/dashboard" className="text-lg text-white sm:text-3xl">Get started</Link>
     </main>
   );
 }

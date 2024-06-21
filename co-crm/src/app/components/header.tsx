@@ -10,11 +10,7 @@ export interface HeaderProps {
 }
 
 export default function Header({ children }: HeaderProps) {
-  const { data: session, status } = useSession();
-
-  if (status === 'loading') {
-    return <p>Loading...</p>;
-  }
+  const { data: session } = useSession();
 
   const userImage = session?.user?.image ? session.user.image : '/images/avatar1.png';
 

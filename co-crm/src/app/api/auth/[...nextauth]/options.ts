@@ -63,6 +63,7 @@ export const options: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    // https://authjs.dev/guides/basics/role-based-access-control#persisting-the-role
     async jwt({ token, user }) {
       if (user) token.role = user.role;
       return token;
