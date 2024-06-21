@@ -9,22 +9,28 @@ export default withAuth(
     console.log('pathname:', request.nextUrl.pathname);
     console.log('token:', request.nextauth.token);
 
-    if( request.nextUrl.pathname.startsWith("/dashboard/settings")
-    && request.nextauth.token?.role !== "admin"){
-        return NextResponse.rewrite(
-            new URL('/dashboard', request.url)
-        )
+    if (
+      request.nextUrl.pathname.startsWith('/dashboard/settings') &&
+      request.nextauth.token?.role !== 'admin'
+    ) {
+      return NextResponse.rewrite(
+        // new URL('/dashboard', request.url)
+        new URL('/denied', request.url),
+      );
     }
 
-    if( request.nextUrl.pathname.startsWith('/companies/new')
-    && request.nextauth.token?.role !== "admin"
-    && request.nextauth.token?.role !== "manager"){
-        return NextResponse.rewrite(
-            new URL('/companies', request.url)
-        )
+    if (
+      request.nextUrl.pathname.startsWith('/companies/new') &&
+      request.nextauth.token?.role !== 'admin' &&
+      request.nextauth.token?.role !== 'manager'
+    ) {
+      return NextResponse.rewrite(
+        // new URL('/companies', request.url)
+        new URL('/denied', request.url),
+      );
     }
   },
-  
+
   {
     callbacks: {
       authorized: ({ token }) => !!token,
