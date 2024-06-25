@@ -12,7 +12,10 @@ export interface HeaderProps {
 export default function Header({ children }: HeaderProps) {
   const { data: session } = useSession();
 
-  const userImage = session?.user?.image ? session.user.image : '/images/avatar1.png';
+  const userImage = session?.user?.image;
+  const userName = session?.user?.name || '';
+  const userEmail = session?.user?.email || '';
+  const userRole = session?.user?.role || '';
 
   return (
     <header className="flex items-center gap-5 py-6 px-10 border-b border-gray-300">
@@ -23,29 +26,31 @@ export default function Header({ children }: HeaderProps) {
       <div className="flex gap-3">
         {session ? (
           <>
-          <div className="relative w-14 h-14">
-              <Image
-                layout="fill"
-                objectFit="cover"
-                src={userImage}
-                alt="avatar"
-                className="rounded-full"
-              />
+            <div className="relative w-14 h-14">
+              {userImage ? (
+                <Image
+                  layout="fill"
+                  objectFit="cover"
+                  src={userImage}
+                  alt="avatar"
+                  className="rounded-full"
+                />
+              ) : (
+                <div className="bg-gray-800 text-2xl font-bold text-white rounded-full flex items-center justify-center w-14 h-14">
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
             <div>
               <p className="text-base font-semibold text-gray-900">
-                {session.user?.name}
+                {userName}
               </p>
-              <p className="text-sm font-light text-gray-900">
-                {session.user?.email}
-              </p>
-              <p className="text-sm font-light text-gray-900">
-                {session.user.role}
-              </p>
+              <p className="text-sm font-light text-gray-900">{userEmail}</p>
+              <p className="text-sm font-light text-gray-900">{userRole}</p>
             </div>
           </>
         ) : (
-          <Link href="/api/auth/sign in">Sign in</Link>
+          <Link href="/api/auth/signin">Sign in</Link>
         )}
       </div>
     </header>

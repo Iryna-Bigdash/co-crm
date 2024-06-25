@@ -3,6 +3,7 @@
         "Bigdash",
         "clsx",
         "Formik",
+        "nextauth",
         "tailwindcss",
         "tanstack"
     ],

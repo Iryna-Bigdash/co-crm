@@ -1,6 +1,6 @@
 // pages/denied.tsx
 'use client';
-import AccessNotification from '@/app/components/access-notofication';
+import AccessNotification from '@/app/components/access-notification';
 import React from 'react';
 
 export interface PageProps {}
