@@ -6,6 +6,11 @@ import CompanyTable from '@/app/components/company-table';
 
 export interface PageProps {}
 
+export const metadata = {
+  title: 'Companies 👩🏻‍💻',
+  description: 'Developed by Iryna Bigdash'
+  }
+
 export default async function Page({}: PageProps) {
   const queryClient = getQueryClient();
 

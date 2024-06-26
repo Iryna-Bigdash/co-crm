@@ -10,6 +10,31 @@ export interface PageProps {
   params: { id: string };
 }
 
+// Generate dynamic metadata for the page
+export async function generateMetadata({ params }: PageProps) {
+  const queryClient = getQueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ['companies', params.id],
+    queryFn: () => getCompany(params.id, { cache: 'no-store' }),
+    staleTime: 10 * 1000,
+  });
+
+  const company = queryClient.getQueryData(['companies', params.id]) as Company;
+
+  if (!company) {
+    return {
+      title: 'Company Not Found',
+      description: 'The requested company could not be found.',
+    };
+  }
+
+  return {
+    title: company.title,
+    description: `This is the page of ${company.title}`,
+  };
+}
+
 export default async function Page({ params }: PageProps) {
   const queryClient = getQueryClient();
 
@@ -27,6 +52,7 @@ export default async function Page({ params }: PageProps) {
   });
 
   const company = queryClient.getQueryData(['companies', params.id]) as Company;
+  
   if (!company) {
     notFound();
   }
