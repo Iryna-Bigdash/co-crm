@@ -61,6 +61,8 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
   });
 
   const handleSubmit = async (values: CompanyFieldValues) => {
+    console.log("Submitted values:", values);
+    
     await mutation.mutateAsync({
       ...values,
       categoryTitle:

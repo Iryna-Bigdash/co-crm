@@ -7,7 +7,7 @@
 
  export default function NotFound({}: NotFoundProps) {
    return (
-     <div className='bg-pink-100 h-dvh flex flex-col justify-center items-center'>
+     <div className='p-16 flex flex-col justify-center items-center'>
        <p>Could not found the company</p>
        <Link href="/companies" className="text-blue-500 mt-4">
          Back to companies

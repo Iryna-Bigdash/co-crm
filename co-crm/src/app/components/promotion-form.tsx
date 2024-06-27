@@ -54,6 +54,8 @@ export default function PromotionForm({
   });
 
   const handleSubmit = async (values: PromotionFieldValues) => {
+    console.log('promotions values:', values)
+
     if (!company) {
       return;
     }
@@ -98,3 +100,5 @@ export default function PromotionForm({
     </Formik>
   );
 }
+
+
