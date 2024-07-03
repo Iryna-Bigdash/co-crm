@@ -5,6 +5,7 @@ import { Company, getCompany, getPromotions } from '@/lib/api';
 import getQueryClient from '@/lib/utils/getQueryClient';
 import CompanyInfo from '@/app/components/company-info';
 import CompanyPromotions from '@/app/components/company-promotions';
+import CompanyDetails from '@/app/components/company-details';
 
 export interface PageProps {
   params: { id: string };
@@ -52,7 +53,7 @@ export default async function Page({ params }: PageProps) {
   });
 
   const company = queryClient.getQueryData(['companies', params.id]) as Company;
-  
+
   if (!company) {
     notFound();
   }
@@ -67,6 +68,9 @@ export default async function Page({ params }: PageProps) {
         </div>
         <div className="col-span-9">
           <CompanyPromotions companyId={params.id} />
+        </div>
+        <div className="col-span-9">
+          <CompanyDetails companyId={params.id} />
         </div>
       </div>
     </HydrationBoundary>

@@ -133,3 +133,16 @@ export const createPromotion = async (
     },
   });
 };
+
+export const deleteCompany = async (
+  id: string,
+  init?: RequestInit,
+) => {
+  return sendRequest<Company>(buildUrl('companies', id), {
+    ...init,
+    method: 'DELETE',
+    headers: {
+      ...(init && init.headers),
+    },
+  });
+};

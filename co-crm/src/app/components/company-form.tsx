@@ -14,6 +14,7 @@ import InputField from '@/app/components/input-field';
 import LogoUploader from '@/app/components/logo-uploader';
 import StatusLabel from '@/app/components/status-label';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 export type CompanyFieldValues = {
   title: string;
@@ -40,6 +41,7 @@ export interface CompanyFormProps {
 
 export default function CompanyForm({ onSubmit }: CompanyFormProps) {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -68,6 +70,7 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
         draggable: true,
         progress: undefined,
       });
+      router.push("/companies");
     },
     onError: (error: any) => {
       console.error('Company not added:', error);
