@@ -66,6 +66,15 @@
     }
   }
 
+  .Toastify__toast-container {
+    @apply flex justify-center items-center;
+  }
+
+  .Toastify__toast {
+    @apply m-4;
+  }
+
+
   /* @layer base {
     * {
       @apply border-border;

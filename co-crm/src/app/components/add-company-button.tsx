@@ -9,7 +9,7 @@ export default function AddCompanyButton() {
 
   return (
     <>
-      <Button onClick={() => router.push('/companies/new')}>
+      <Button onClick={() => router.push('/companies/new', { scroll: false })}>
       Add company
     </Button></>
   

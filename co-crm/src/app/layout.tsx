@@ -2,6 +2,8 @@ import React from 'react';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import AuthProviders from './components/auth-providers';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const font = Plus_Jakarta_Sans({ subsets: ['latin'] });
 
@@ -21,6 +23,18 @@ export default function RootLayout({
         <AuthProviders>
           {children}
         </AuthProviders>
+        <ToastContainer 
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          toastClassName="toast"
+        />
       </body>
     </html>
   );
