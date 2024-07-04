@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { deleteCompany, getCompanies } from '@/lib/api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteCompany } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 
@@ -10,17 +10,9 @@ interface DeleteCompanyButtonProps {
   companyId: string;
 }
 
-const DeleteCompanyButton: React.FC<DeleteCompanyButtonProps> = ({
-  companyId,
-}) => {
+export default function DeleteCompanyButton({companyId}: DeleteCompanyButtonProps){
   const router = useRouter();
   const queryClient = useQueryClient();
-
-  const { data: companies } = useQuery({
-    queryKey: ['companies'],
-    queryFn: getCompanies,
-    staleTime: 10 * 1000,
-  });
 
   const mutation = useMutation({
     mutationFn: deleteCompany,
@@ -63,4 +55,3 @@ const DeleteCompanyButton: React.FC<DeleteCompanyButtonProps> = ({
   );
 };
 
-export default DeleteCompanyButton;

@@ -8,7 +8,14 @@ const nextConfig = {
         port: '',
         pathname: '/u/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'asset.brandfetch.io',
+        port: '',
+        pathname: '/**',
+      },
     ],
+   
   },
 };
 

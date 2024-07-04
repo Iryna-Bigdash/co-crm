@@ -10,6 +10,7 @@ export interface CompanyDetailsProps {
 
 export default function CompanyDetails({ companyId }: CompanyDetailsProps) {
   const router = useRouter();
+  
   return (
     <Button
       onClick={() =>
@@ -20,3 +21,7 @@ export default function CompanyDetails({ companyId }: CompanyDetailsProps) {
     </Button>
   );
 }
+
+
+
+

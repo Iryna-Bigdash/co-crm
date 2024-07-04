@@ -11,7 +11,6 @@ export interface PageProps {
   params: { id: string };
 }
 
-// Generate dynamic metadata for the page
 export async function generateMetadata({ params }: PageProps) {
   const queryClient = getQueryClient();
 
