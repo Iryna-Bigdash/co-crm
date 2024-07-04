@@ -2,6 +2,8 @@ import React from 'react';
  import Toolbar from '@/app/components/toolbar';
 //  import SearchInput from '@/app/components/search-input';
  import AddPromotionButton from '@/app/components/add-promotion-button';
+ import CompanyDetails from '@/app/components/company-details';
+
 
  export interface PageProps {
    params: { id: string };
@@ -11,6 +13,8 @@ import React from 'react';
    return (
      <Toolbar action={<AddPromotionButton companyId={params.id} />}>
        {/* <SearchInput /> */}
+       <CompanyDetails companyId={params.id} />
+      
      </Toolbar>
    );
  }
