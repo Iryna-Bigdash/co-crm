@@ -121,10 +121,11 @@ export const createCompany = async (
 };
 
 export const createPromotion = async (
-  data: Omit<Promotion, 'id'>,
+  data: Omit<Promotion, 'id' >,
   init?: RequestInit,
 ) => {
   return sendRequest<Promotion>(buildUrl('promotions'), {
+    ...init,
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
