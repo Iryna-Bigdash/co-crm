@@ -14,7 +14,7 @@ export const options: NextAuthOptions = {
   providers: [
     GitHubProvider({
       profile(profile: GithubProfile) {
-        console.log(profile);
+        // console.log(profile);
         return {
           ...profile,
           role: profile.role ?? 'user',
