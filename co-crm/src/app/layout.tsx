@@ -4,7 +4,6 @@ import './globals.css';
 import AuthProviders from './components/auth-providers';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
 const font = Plus_Jakarta_Sans({ subsets: ['latin'] });
 
 export const metadata = {
@@ -19,6 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+    <head>
+    <link rel="icon" href='icons/favicon.svg' sizes="any" />
+    </head>
       <body className={font.className}>
         <AuthProviders>
           {children}
