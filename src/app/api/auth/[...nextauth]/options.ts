@@ -48,7 +48,7 @@ export const options: NextAuthOptions = {
           id: '28',
           name: 'Iryna',
           password: '123456Ira',
-          role: 'manager',
+          role: 'admin',
         };
 
         if (
