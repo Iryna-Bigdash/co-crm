@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import { limiter } from './config/limiter';
 
 export interface SummaryStats {
@@ -68,26 +67,22 @@ const stringifyQueryParams = (params: Record<string, string>) =>
 const sendRequestWithLimit = async <T>(
   url: string,
   init?: RequestInit,
-): Promise<T | Response> => {
+): Promise<T> => {
   const remainingTokens = await limiter.removeTokens(1);
 
   console.log('remainingTokens', remainingTokens);
 
   if (remainingTokens < 0) {
-    return new NextResponse(null, {
-      status: 429,
-      statusText: 'Rate limit exceeded, please try again later.',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'text/plain',
-      },
-    });
+    throw new Error('Rate limit exceeded');
   }
 
   const res = await fetch(url, init);
+
   if (!res.ok) {
-    throw new Error(await res.text());
+    const errorText = await res.text();
+    throw new Error(errorText);
   }
+
   return res.json() as Promise<T>;
 };
 
@@ -137,8 +132,8 @@ export const createCompany = async (
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
-      ...(init && init.headers),
-      'content-type': 'application/json',
+      ...(init?.headers || {}),
+      'Content-Type': 'application/json',
     },
   });
 };
@@ -152,8 +147,8 @@ export const createPromotion = async (
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
-      ...(init && init.headers),
-      'content-type': 'application/json',
+      ...(init?.headers || {}),
+      'Content-Type': 'application/json',
     },
   });
 };
@@ -163,7 +158,7 @@ export const deleteCompany = async (id: string, init?: RequestInit) => {
     ...init,
     method: 'DELETE',
     headers: {
-      ...(init && init.headers),
+      ...(init?.headers || {}),
     },
   });
 };

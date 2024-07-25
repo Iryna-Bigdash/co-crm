@@ -1,7 +1,7 @@
 import { RateLimiter } from 'limiter';
 
 export const limiter = new RateLimiter({
-  tokensPerInterval: 15,
+  tokensPerInterval: 30,
   interval: 'second',
   fireImmediately: true
 });
