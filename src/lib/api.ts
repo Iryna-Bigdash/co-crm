@@ -1,3 +1,6 @@
+import { NextResponse } from 'next/server';
+import { limiter } from './config/limiter';
+
 export interface SummaryStats {
   promotions: number;
   categories: number;
@@ -62,44 +65,64 @@ const buildUrl = (...paths: string[]) =>
 const stringifyQueryParams = (params: Record<string, string>) =>
   new URLSearchParams(params).toString();
 
-const sendRequest = async <T>(url: string, init?: RequestInit) => {
+const sendRequestWithLimit = async <T>(
+  url: string,
+  init?: RequestInit,
+): Promise<T | Response> => {
+  const remainingTokens = await limiter.removeTokens(1);
+
+  console.log('remainingTokens', remainingTokens);
+
+  if (remainingTokens < 0) {
+    return new NextResponse(null, {
+      status: 429,
+      statusText: 'Rate limit exceeded, please try again later.',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'text/plain',
+      },
+    });
+  }
+
   const res = await fetch(url, init);
   if (!res.ok) {
     throw new Error(await res.text());
   }
-
-  return (await res.json()) as T;
+  return res.json() as Promise<T>;
 };
 
 export const getSummaryStats = (init?: RequestInit) => {
-  return sendRequest<SummaryStats>(buildUrl('summary-stats', '1'), init);
+  return sendRequestWithLimit<SummaryStats>(
+    buildUrl('summary-stats', '1'),
+    init,
+  );
 };
 
 export const getSummarySales = (init?: RequestInit) => {
-  return sendRequest<SummarySales[]>(buildUrl('summary-sales'), init);
+  return sendRequestWithLimit<SummarySales[]>(buildUrl('summary-sales'), init);
 };
 
 export const getCountries = (init?: RequestInit) => {
-  return sendRequest<Country[]>(buildUrl('countries'), init);
+  return sendRequestWithLimit<Country[]>(buildUrl('countries'), init);
 };
 
 export const getCategories = (init?: RequestInit) => {
-  return sendRequest<Category[]>(buildUrl('categories'), init);
+  return sendRequestWithLimit<Category[]>(buildUrl('categories'), init);
 };
 
 export const getCompanies = (init?: RequestInit) => {
-  return sendRequest<Company[]>(buildUrl('companies'), init);
+  return sendRequestWithLimit<Company[]>(buildUrl('companies'), init);
 };
 
 export const getCompany = (id: string, init?: RequestInit) => {
-  return sendRequest<Company>(buildUrl('companies', id), init);
+  return sendRequestWithLimit<Company>(buildUrl('companies', id), init);
 };
 
 export const getPromotions = async (
   params: Record<string, string> = {},
   init?: RequestInit,
 ) => {
-  return sendRequest<Promotion[]>(
+  return sendRequestWithLimit<Promotion[]>(
     `${buildUrl('promotions')}?${stringifyQueryParams(params)}`,
     init,
   );
@@ -109,7 +132,7 @@ export const createCompany = async (
   data: Omit<Company, 'id' | 'hasPromotions'>,
   init?: RequestInit,
 ) => {
-  return sendRequest<Company>(buildUrl('companies'), {
+  return sendRequestWithLimit<Company>(buildUrl('companies'), {
     ...init,
     method: 'POST',
     body: JSON.stringify(data),
@@ -121,10 +144,10 @@ export const createCompany = async (
 };
 
 export const createPromotion = async (
-  data: Omit<Promotion, 'id' >,
+  data: Omit<Promotion, 'id'>,
   init?: RequestInit,
 ) => {
-  return sendRequest<Promotion>(buildUrl('promotions'), {
+  return sendRequestWithLimit<Promotion>(buildUrl('promotions'), {
     ...init,
     method: 'POST',
     body: JSON.stringify(data),
@@ -135,11 +158,8 @@ export const createPromotion = async (
   });
 };
 
-export const deleteCompany = async (
-  id: string,
-  init?: RequestInit,
-) => {
-  return sendRequest<Company>(buildUrl('companies', id), {
+export const deleteCompany = async (id: string, init?: RequestInit) => {
+  return sendRequestWithLimit<Company>(buildUrl('companies', id), {
     ...init,
     method: 'DELETE',
     headers: {
