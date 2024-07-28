@@ -162,3 +162,28 @@ export const deleteCompany = async (id: string, init?: RequestInit) => {
     },
   });
 };
+
+export const updateCompanyDescription = async (
+  companyId: string,
+  newDescription: string,
+  init?: RequestInit,
+) => {
+  return sendRequestWithLimit<Company>(buildUrl('companies', companyId), {
+    ...init,
+    method: 'PUT',
+    body: JSON.stringify({ description: newDescription }),
+    headers: {
+      ...(init?.headers || {}),
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+
+
+
+
+
+
+
+
