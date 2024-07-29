@@ -28,3 +28,4 @@ export default async function Page({}: PageProps) {
     </HydrationBoundary>
   );
 }
+

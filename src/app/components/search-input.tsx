@@ -21,6 +21,7 @@ import React from 'react';
          type="button"
          className="absolute top-0	right-0 p-3"
          onClick={onSearchClick}
+         aria-label="Search"
        >
          <Image
            width={20}

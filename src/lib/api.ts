@@ -179,7 +179,15 @@ export const updateCompanyDescription = async (
   });
 };
 
-
+export const getCompaniesByTitle = async (
+  title: string,
+  init?: RequestInit
+) => {
+  return sendRequestWithLimit<Company[]>(
+    `${buildUrl('companies')}?${stringifyQueryParams({ title })}`,
+    init
+  );
+};
 
 
 
