@@ -7,12 +7,10 @@ import UpdateDescriptionButton from './update-description-button';
 
 export interface DetailsCompanyModal extends ModalProps {
   companyId: string;
-  promotionId: string; 
 }
 
 export default function DetailsCompanyModal({
   companyId,
-  promotionId,
   onClose,
   ...rest
 }: DetailsCompanyModal) {
