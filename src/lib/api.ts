@@ -70,7 +70,7 @@ const sendRequestWithLimit = async <T>(
 ): Promise<T> => {
   const remainingTokens = await limiter.removeTokens(1);
 
-  console.log('remainingTokens', remainingTokens);
+  // console.log('remainingTokens', remainingTokens);
 
   if (remainingTokens < 0) {
     throw new Error('Rate limit exceeded');
@@ -181,17 +181,10 @@ export const updateCompanyDescription = async (
 
 export const getCompaniesByTitle = async (
   title: string,
-  init?: RequestInit
+  init?: RequestInit,
 ) => {
   return sendRequestWithLimit<Company[]>(
     `${buildUrl('companies')}?${stringifyQueryParams({ title })}`,
-    init
+    init,
   );
 };
-
-
-
-
-
-
-
