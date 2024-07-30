@@ -37,7 +37,6 @@ export default function SearchInput() {
           height={20}
           src="/icons/magnifying-glass.svg"
           alt="search icon"
-          className="absolute top-0 right-0 p-3"
         />
       </button>
     </div>

@@ -62,20 +62,19 @@ export default function UpdateDescriptionButton({
   };
 
   return (
-    <div className="flex flex-col items-center gap-2 min-h-8">
-      <textarea
-        value={newDescription}
-        onChange={(e) => setNewDescription(e.target.value)}
-        className="border px-2 py-1 flex-grow"
-        rows={4}
-      />
+    <div className="flex gap-4 w-full items-start">
       <button
         onClick={handleUpdateDescription}
-        className="bg-blue-500 text-white px-4 py-2 flex-grow"
-        // disabled={newDescription.length < 5 || newDescription.length > 200}
+        className="bg-blue-500 text-white px-4 py-2 flex-shrink-0"
       >
         Update Description
       </button>
+      <textarea
+        value={newDescription}
+        onChange={(e) => setNewDescription(e.target.value)}
+        className="border px-2 py-1 flex-1 resize-none"
+        rows={2}
+      />
     </div>
   );
 }

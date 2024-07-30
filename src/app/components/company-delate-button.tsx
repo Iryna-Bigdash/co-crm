@@ -10,7 +10,9 @@ interface DeleteCompanyButtonProps {
   companyId: string;
 }
 
-export default function DeleteCompanyButton({companyId}: DeleteCompanyButtonProps){
+export default function DeleteCompanyButton({
+  companyId,
+}: DeleteCompanyButtonProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -53,5 +55,4 @@ export default function DeleteCompanyButton({companyId}: DeleteCompanyButtonProp
       Delete Company
     </button>
   );
-};
-
+}
