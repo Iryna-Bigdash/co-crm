@@ -11,13 +11,39 @@ export interface CompanyRowProps {
 
 export default function CompanyRow({ company }: CompanyRowProps) {
   return (
-    <tr className="h-14 text-center text-gray-900 bg-white">
+    <tr className="h-14 text-center text-gray-900 bg-white ">
       <td className="text-xs font-medium text-blue-700 rounded-l border-l-4 border-blue-700">
         {company.categoryTitle}
       </td>
-      <td>
-        <Link href={`/companies/${company.id}`}>{company.title}</Link>
+      <td className="w-56 pl-10">
+        <div className="flex items-center gap-4">
+          <div className="inline-block">
+            {company.avatar ? (
+              <Image
+                src={company.avatar}
+                alt="company avatar"
+                width={32}
+                height={32}
+                objectFit="cover"
+                className="rounded-full"
+              />
+            ) : (
+              <Image
+                src="/images/company-avatar.png"
+                alt="default company avatar"
+                width={32}
+                height={32}
+                objectFit="cover"
+                className="rounded-full"
+              />
+            )}
+          </div>
+          <Link href={`/companies/${company.id}`} className="text-blue-600">
+            {company.title}
+          </Link>
+        </div>
       </td>
+
       <td>
         <StatusLabel status={company.status} />
       </td>

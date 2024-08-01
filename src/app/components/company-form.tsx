@@ -70,7 +70,7 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
         draggable: true,
         progress: undefined,
       });
-      router.push("/companies");
+      router.push('/companies');
     },
     onError: (error: any) => {
       console.error('Company not added:', error);
