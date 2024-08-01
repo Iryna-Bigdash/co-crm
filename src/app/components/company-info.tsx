@@ -22,8 +22,24 @@ export default function CompanyInfo({ companyId }: CompanyInfoProps) {
     <div className="flex flex-col gap-5">
       <div className="flex flex-col items-center p-7 gap-5 bg-gray-900 rounded">
         <div className="w-20 h-20 rounded-full bg-blue-500">
-          {company.avatar && (
-            <Image fill src={company.avatar} alt="company avatar" />
+        {company.avatar ? (
+            <Image
+              src={company.avatar}
+              alt="company avatar"
+              width={80}
+              height={80}
+              objectFit="cover"
+              className="rounded-full"
+            />
+          ) : (
+            <Image
+              src="/images/company-avatar.png"
+              alt="default company avatar"
+              objectFit="cover"
+              className="rounded-full"
+              width={80}
+              height={80}
+            />
           )}
         </div>
         <p className="pb text-base font-semibold text-white">{company.title}</p>
