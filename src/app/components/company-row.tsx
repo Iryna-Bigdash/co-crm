@@ -1,19 +1,38 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import clsx from 'clsx';
 import StatusLabel from '@/app/components/status-label';
 import { Company } from '@/lib/api';
+import CategoriesLabel from './category-label';
+import clsx from 'clsx';
 
 export interface CompanyRowProps {
   company: Company;
 }
 
+const borderColorClasses: Record<string, string> = {
+  '1': 'border-emerald-400',
+  '2': 'border-red-400',
+  '3': 'border-orange-400',
+  '4': 'border-yellow-400',
+  '5': 'border-purple-400',
+  '6': 'border-rose-400',
+  '7': 'border-indigo-400',
+  '8': 'border-lime-400',
+};
+
 export default function CompanyRow({ company }: CompanyRowProps) {
+  const category = { id: company.categoryId, title: company.categoryTitle };
+
   return (
-    <tr className="h-14 text-center text-gray-900 bg-white ">
-      <td className="text-xs font-medium text-blue-700 rounded-l border-l-4 border-blue-700">
-        {company.categoryTitle}
+    <tr className="h-14 text-center text-gray-900 bg-white">
+      <td
+        className={clsx(
+          'text-xs font-medium rounded-l border-l-4',
+          borderColorClasses[company.categoryId],
+        )}
+      >
+        <CategoriesLabel category={category} />
       </td>
       <td className="w-56 pl-10">
         <div className="flex items-center gap-4">
@@ -38,12 +57,11 @@ export default function CompanyRow({ company }: CompanyRowProps) {
               />
             )}
           </div>
-          <Link href={`/companies/${company.id}`} className="text-blue-600">
+          <Link href={`/companies/${company.id}`} className="text-gray-900">
             {company.title}
           </Link>
         </div>
       </td>
-
       <td>
         <StatusLabel status={company.status} />
       </td>
@@ -56,10 +74,7 @@ export default function CompanyRow({ company }: CompanyRowProps) {
             alt="promotion icon"
           />
           <span
-            className={clsx(
-              'text-sm font-medium',
-              company.hasPromotions ? 'text-green-700' : 'text-red-700',
-            )}
+            className={`text-sm font-medium ${company.hasPromotions ? 'text-green-700' : 'text-red-700'}`}
           >
             {company.hasPromotions ? 'Yes' : 'No'}
           </span>
