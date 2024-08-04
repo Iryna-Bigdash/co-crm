@@ -2,7 +2,6 @@ import { NextAuthOptions } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { GithubProfile } from 'next-auth/providers/github';
-import { Session } from 'inspector';
 
 export const options: NextAuthOptions = {
   theme: {
@@ -44,6 +43,7 @@ export const options: NextAuthOptions = {
         // This is where you need to retrieve user data
         // to verify with credentials
         // Docs: https://next-auth.js.org/configuration/providers/credentials
+        console.log('Credentials Authorize Callback:', credentials); 
         const user = {
           id: '28',
           name: 'Iryna',
@@ -74,4 +74,6 @@ export const options: NextAuthOptions = {
       return session;
     },
   },
+
+  debug: process.env.NODE_ENV === 'development',
 };
