@@ -79,18 +79,26 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
   });
 
   const handleSubmit = async (values: CompanyFieldValues) => {
-    console.log('Submitted values:', values);
+    const trimmedValues = {
+      ...values,
+      title: values.title.trim(),
+      description: values.description.trim(),
+      categoryId: values.categoryId.trim(),
+      countryId: values.countryId.trim(),
+    };
 
     await mutation.mutateAsync({
-      ...values,
+      ...trimmedValues,
       categoryTitle:
-        categories?.find(({ id }) => id === values.categoryId)?.title ?? '',
+        categories?.find(({ id }) => id === trimmedValues.categoryId)?.title ??
+        '',
       countryTitle:
-        countries?.find(({ id }) => id === values.countryId)?.title ?? '',
+        countries?.find(({ id }) => id === trimmedValues.countryId)?.title ??
+        '',
     });
 
     if (onSubmit) {
-      onSubmit(values);
+      onSubmit(trimmedValues);
     }
   };
 
