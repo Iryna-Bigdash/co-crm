@@ -8,7 +8,9 @@ export interface PageProps {}
 
 export const metadata = {
   title: 'Companies 👩🏻‍💻',
-  description: 'Developed by Iryna Bigdash'
+  description: 'Developed by Iryna Bigdash',
+  keywords: 'Iryna Bigdash, developer, companies, tech',
+  author: 'Iryna Bigdash'
   }
 
 export default async function Page({}: PageProps) {

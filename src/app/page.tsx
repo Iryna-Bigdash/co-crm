@@ -3,6 +3,13 @@ import Image from 'next/image';
 import Greeting from './components/greeting';
 import Link from 'next/link';
 
+export const metadata = {
+  title: 'Home - CRM 👩🏻‍💻',
+  description: 'Welcome to the home page developed by Iryna Bigdash.',
+  keywords: 'Iryna Bigdash, CRM, developer, tech, system business, site faro',
+  author: 'Iryna Bigdash'
+  } 
+
 export default function Home() {
   return (
     <main className="bg-slate-800 min-h-screen flex flex-col justify-between py-4">
