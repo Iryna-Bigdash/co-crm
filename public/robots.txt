@@ -1,0 +1,15 @@
+# *
+User-agent: *
+Allow: /
+
+# Googlebot
+User-agent: Googlebot
+Disallow: /admin
+
+# Host
+Host: https://co-crm.vercel.app
+
+# Sitemaps
+Sitemap: https://co-crm.vercel.app/sitemap.xml
+Sitemap: https://co-crm.vercel.app/my-custom-sitemap-1.xml
+Sitemap: https://co-crm.vercel.app/my-custom-sitemap-2.xml
