@@ -1,21 +1,32 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
+import debounce from 'lodash/debounce';
 
 export default function SearchInput() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const searchQuery = searchParams.get('search') || '';
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+
+  const debouncedUpdateSearchQuery = useMemo(() => 
+    debounce((newQuery: string) => {
+      const newParams = new URLSearchParams(searchParams.toString());
+
+      if (newQuery.trim() === '') {
+        newParams.delete('search');
+      } else {
+        newParams.set('search', newQuery);
+      }
+
+      router.push(`?${newParams.toString()}`);
+    }, 500), [router, searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuery = e.target.value;
-    const newParams = new URLSearchParams(searchParams.toString());
-    newParams.set('search', newQuery);
-
-    router.push(`?${newParams.toString()}`);
+    setSearchQuery(e.target.value);
+    debouncedUpdateSearchQuery(e.target.value); 
   };
 
   return (
@@ -42,3 +53,4 @@ export default function SearchInput() {
     </div>
   );
 }
+

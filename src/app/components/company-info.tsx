@@ -12,7 +12,7 @@ export interface CompanyInfoProps {
 
 export default function CompanyInfo({ companyId }: CompanyInfoProps) {
   const { data: company } = useQuery({
-    queryKey: ['companies', companyId],
+    queryKey: ['company', companyId],
     queryFn: () => getCompany(companyId),
     staleTime: 10 * 1000,
   });

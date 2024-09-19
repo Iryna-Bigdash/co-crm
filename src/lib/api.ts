@@ -16,8 +16,24 @@ export interface SummarySales {
 }
 
 export interface Country {
+  name: string;
+  id: string;
+}
+
+export interface CountryWithCompanyCount {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  _count: {
+    companies: number;
+  };
+}
+
+export interface CountryWithCategoriesCount {
   id: string;
   title: string;
+  count: number;
 }
 
 export interface Category {
@@ -40,9 +56,9 @@ export interface Company {
   joinedDate: string;
   hasPromotions: boolean;
   categoryId: string;
-  categoryTitle: string;
   countryId: string;
-  countryTitle: string;
+  categoryTitle?: string;
+  countryTitle?: string; 
   avatar?: string;
 }
 
@@ -52,14 +68,19 @@ export interface Promotion {
   description: string;
   discount: number;
   companyId: string;
-  companyTitle: string;
+  companyTitle?: string;
   avatar?: string;
 }
 
 const PROJECT_TOKEN = process.env.NEXT_PUBLIC_PROJECT_TOKEN;
 
+// const buildUrl = (...paths: string[]) =>
+//   `https://${PROJECT_TOKEN}.mockapi.io/api/v1/${paths.join('/')}`;
+// const buildUrl = (...paths: string[]) =>
+//   `http://localhost:3000/api/${paths.join('/')}`;
 const buildUrl = (...paths: string[]) =>
-  `https://${PROJECT_TOKEN}.mockapi.io/api/v1/${paths.join('/')}`;
+  `https://co-crm-api-production.up.railway.app/api/${paths.join('/')}`;
+
 
 const stringifyQueryParams = (params: Record<string, string>) =>
   new URLSearchParams(params).toString();
@@ -88,7 +109,7 @@ const sendRequestWithLimit = async <T>(
 
 export const getSummaryStats = (init?: RequestInit) => {
   return sendRequestWithLimit<SummaryStats>(
-    buildUrl('summary-stats', '1'),
+    buildUrl('summary-stats'),
     init,
   );
 };
@@ -101,17 +122,57 @@ export const getCountries = (init?: RequestInit) => {
   return sendRequestWithLimit<Country[]>(buildUrl('countries'), init);
 };
 
-export const getCategories = (init?: RequestInit) => {
-  return sendRequestWithLimit<Category[]>(buildUrl('categories'), init);
+export const getCountriesWithCompanyCounts = async (init?: RequestInit) => {
+  return sendRequestWithLimit<CountryWithCompanyCount[]>(
+    buildUrl('countries', 'with-companies'),
+    init,
+  );
+};
+
+export const getCategoriesCounts = async (init?: RequestInit) => {
+  return sendRequestWithLimit<CountryWithCategoriesCount[]>(
+    buildUrl('categories', 'with-companies'),
+    init, 
+  )
+}
+
+export const getCategories = async (init?: RequestInit): Promise<Category[]> => {
+  try {
+    const data = await sendRequestWithLimit<Category[]>(buildUrl('categories'), init);
+    return data;
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    throw new Error('Failed to fetch categories');
+  }
+};
+
+export const createCompany = async (
+  data: Omit<Company, 'id' | 'hasPromotions'>,
+  init?: RequestInit,
+) => {
+  return sendRequestWithLimit<Company>(buildUrl('company'), {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      ...(init?.headers || {}),
+      'Content-Type': 'application/json',
+    },
+  });
 };
 
 export const getCompanies = (init?: RequestInit) => {
-  return sendRequestWithLimit<Company[]>(buildUrl('companies'), init);
+  return sendRequestWithLimit<Company[]>(buildUrl('company'), init);
 };
 
 export const getCompany = (id: string, init?: RequestInit) => {
-  return sendRequestWithLimit<Company>(buildUrl('companies', id), init);
+  return sendRequestWithLimit<Company>(buildUrl('company', id), init);
 };
+
+export const getPromotionsforSelectedCompany = (companyId: string, init?: RequestInit) => {
+  return sendRequestWithLimit<Promotion[]>(buildUrl('promotions', 'company', companyId), init);
+}
+
 
 export const getPromotions = async (
   params: Record<string, string> = {},
@@ -123,11 +184,16 @@ export const getPromotions = async (
   );
 };
 
-export const createCompany = async (
-  data: Omit<Company, 'id' | 'hasPromotions'>,
+export const getPromotion = (id: string, init?: RequestInit) => {
+  return sendRequestWithLimit<Promotion>(buildUrl('promotions', id), init);
+};
+
+export const createPromotion = async (
+  companyId: string,
+  data: Omit<Promotion, 'id'>,
   init?: RequestInit,
 ) => {
-  return sendRequestWithLimit<Company>(buildUrl('companies'), {
+  return sendRequestWithLimit<Promotion>(buildUrl('promotions', companyId), {
     ...init,
     method: 'POST',
     body: JSON.stringify(data),
@@ -138,14 +204,15 @@ export const createCompany = async (
   });
 };
 
-export const createPromotion = async (
-  data: Omit<Promotion, 'id'>,
+export const updatePromotion = async (
+  promotionId: string,
+  newData: {},
   init?: RequestInit,
 ) => {
-  return sendRequestWithLimit<Promotion>(buildUrl('promotions'), {
+  return sendRequestWithLimit<Promotion>(buildUrl('promotions', promotionId), {
     ...init,
-    method: 'POST',
-    body: JSON.stringify(data),
+    method: 'PATCH',
+    body: JSON.stringify(newData),
     headers: {
       ...(init?.headers || {}),
       'Content-Type': 'application/json',
@@ -154,7 +221,17 @@ export const createPromotion = async (
 };
 
 export const deleteCompany = async (id: string, init?: RequestInit) => {
-  return sendRequestWithLimit<Company>(buildUrl('companies', id), {
+  return sendRequestWithLimit<Company>(buildUrl('company', id), {
+    ...init,
+    method: 'DELETE',
+    headers: {
+      ...(init?.headers || {}),
+    },
+  });
+};
+
+export const deletePromotion = async (id: string, init?: RequestInit) => {
+  return sendRequestWithLimit<Promotion>(buildUrl('promotions', id), {
     ...init,
     method: 'DELETE',
     headers: {
@@ -168,9 +245,9 @@ export const updateCompanyDescription = async (
   newDescription: string,
   init?: RequestInit,
 ) => {
-  return sendRequestWithLimit<Company>(buildUrl('companies', companyId), {
+  return sendRequestWithLimit<Company>(buildUrl('company', companyId), {
     ...init,
-    method: 'PUT',
+    method: 'PATCH',
     body: JSON.stringify({ description: newDescription }),
     headers: {
       ...(init?.headers || {}),
@@ -184,7 +261,7 @@ export const getCompaniesByTitle = async (
   init?: RequestInit,
 ) => {
   return sendRequestWithLimit<Company[]>(
-    `${buildUrl('companies')}?${stringifyQueryParams({ title })}`,
+    `${buildUrl('company')}?${stringifyQueryParams({ title })}`,
     init,
   );
 };

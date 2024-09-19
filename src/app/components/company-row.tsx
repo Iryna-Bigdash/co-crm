@@ -22,7 +22,11 @@ const borderColorClasses: Record<string, string> = {
 };
 
 export default function CompanyRow({ company }: CompanyRowProps) {
-  const category = { id: company.categoryId, title: company.categoryTitle };
+
+  const category = {
+    id: company.categoryId,
+    title: company.categoryTitle || "No Category",
+  };
 
   return (
     <tr className="h-14 text-center text-gray-900 bg-white">
@@ -32,7 +36,7 @@ export default function CompanyRow({ company }: CompanyRowProps) {
           borderColorClasses[company.categoryId],
         )}
       >
-        <CategoriesLabel category={category} />
+        <CategoriesLabel category={category}/>
       </td>
       <td className="w-56 pl-10">
         <div className="flex items-center gap-4">

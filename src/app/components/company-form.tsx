@@ -1,8 +1,7 @@
-'use client';
-
 import React from 'react';
 import { Form, Formik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import * as Yup from 'yup'; 
 import {
   CompanyStatus,
   createCompany,
@@ -34,6 +33,17 @@ const initialValues: CompanyFieldValues = {
   countryId: '',
 };
 
+const validationSchema = Yup.object().shape({
+  title: Yup.string().required('Name is required!'),
+  description: Yup.string().required('Description is required!'),
+  status: Yup.string().required('Status is required!'),
+  joinedDate: Yup.date()
+    .required('Joined date is required!')
+    .nullable(),
+  categoryId: Yup.string().required('Category is required!'),
+  countryId: Yup.string().required('Country is required!'),
+});
+
 export interface CompanyFormProps {
   onSubmit?: (values: CompanyFieldValues) => void | Promise<void>;
   onClose?: () => void;
@@ -58,9 +68,13 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
   const mutation = useMutation({
     mutationFn: createCompany,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['companies'],
-      });
+      queryClient.invalidateQueries({ queryKey: ['companies'] })
+      queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.invalidateQueries({ queryKey: ['countries', 'with-companies'] })
+      queryClient.invalidateQueries({ queryKey: ['categories', 'with-companies'] })
+      queryClient.invalidateQueries({ queryKey: ['promotions'] })
+      queryClient.invalidateQueries({ queryKey: ['summary-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['summary-sales'] })    
       toast.success('Company successfully added!', {
         position: 'top-right',
         autoClose: 3000,
@@ -85,17 +99,11 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
       description: values.description.trim(),
       categoryId: values.categoryId.trim(),
       countryId: values.countryId.trim(),
+      joinedDate: new Date(values.joinedDate).toISOString(),
+      hasPromotions: false,
     };
 
-    await mutation.mutateAsync({
-      ...trimmedValues,
-      categoryTitle:
-        categories?.find(({ id }) => id === trimmedValues.categoryId)?.title ??
-        '',
-      countryTitle:
-        countries?.find(({ id }) => id === trimmedValues.countryId)?.title ??
-        '',
-    });
+    await mutation.mutateAsync(trimmedValues);
 
     if (onSubmit) {
       onSubmit(trimmedValues);
@@ -107,74 +115,89 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
   }
 
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-      <Form className="flex flex-col gap-10">
-        <p className="mb-0.5 text-xl">Add new company</p>
-        <div className="flex gap-6">
-          <div className="flex flex-col flex-1 gap-5">
-            <LogoUploader label="Logo" placeholder="Upload photo" />
-            <InputField
-              required
-              label="Status"
-              placeholder="Status"
-              name="status"
-              as="select"
-            >
-              {(Object.values(CompanyStatus) as CompanyStatus[]).map(
-                (status) => (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+    >
+      {({ errors, touched }) => (
+        <Form className="flex flex-col gap-10">
+          <p className="mb-0.5 text-xl">Add new company</p>
+          <div className="flex gap-6">
+            <div className="flex flex-col flex-1 gap-5">
+              <LogoUploader label="Logo" placeholder="Upload photo" />
+              <InputField
+                required
+                label="Status"
+                placeholder="Status"
+                name="status"
+                as="select"
+                error={touched.status && errors.status ? errors.status : undefined}
+              >
+                {Object.values(CompanyStatus).map((status) => (
                   <option key={status} value={status}>
                     <StatusLabel status={status} />
                   </option>
-                ),
-              )}
-            </InputField>
-            <InputField
-              required
-              label="Country"
-              placeholder="Country"
-              name="countryId"
-              as="select"
-            >
-              {countries?.map((country) => (
-                <option key={country.id} value={country.id}>
-                  {country.title}
-                </option>
-              ))}
-            </InputField>
+                ))}
+              </InputField>
+              <InputField
+                required
+                label="Country"
+                placeholder="Country"
+                name="countryId"
+                as="select"
+                error={touched.countryId && errors.countryId ? errors.countryId : undefined}
+              >
+                {countries?.map((country) => (
+                  <option key={country.id} value={country.id}>
+                    {country.name}
+                  </option>
+                ))}
+              </InputField>
+            </div>
+            <div className="flex flex-col flex-1 gap-5">
+              <InputField
+                required
+                label="Name"
+                placeholder="Name"
+                name="title"
+                error={touched.title && errors.title ? errors.title : undefined}
+              />
+              <InputField
+                required
+                label="Category"
+                placeholder="Category"
+                name="categoryId"
+                as="select"
+                error={touched.categoryId && errors.categoryId ? errors.categoryId : undefined}
+              >
+                {categories?.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.title}
+                  </option>
+                ))}
+              </InputField>
+              <InputField
+                required
+                label="Joined date"
+                type="date"
+                name="joinedDate"
+                error={touched.joinedDate && errors.joinedDate ? errors.joinedDate : undefined}
+              />
+              <InputField
+                required
+                label="Description"
+                placeholder="Description"
+                name="description"
+                error={touched.description && errors.description ? errors.description : undefined}
+              />
+            </div>
           </div>
-          <div className="flex flex-col flex-1 gap-5">
-            <InputField required label="Name" placeholder="Name" name="title" />
-            <InputField
-              required
-              label="Category"
-              placeholder="Category"
-              name="categoryId"
-              as="select"
-            >
-              {categories?.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.title}
-                </option>
-              ))}
-            </InputField>
-            <InputField
-              required
-              label="Joined date"
-              type="date"
-              name="joinedDate"
-            />
-            <InputField
-              required
-              label="Description"
-              placeholder="Description"
-              name="description"
-            />
-          </div>
-        </div>
-        <Button type="submit" disabled={mutation.status === 'pending'}>
-          {mutation.status === 'pending' ? 'Adding company..' : 'Add company'}
-        </Button>
-      </Form>
+          <Button type="submit" disabled={mutation.status === 'pending'}>
+            {mutation.status === 'pending' ? 'Adding company..' : 'Add company'}
+          </Button>
+        </Form>
+      )}
     </Formik>
   );
 }
