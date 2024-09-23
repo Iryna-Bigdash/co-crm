@@ -1,8 +1,5 @@
-'use client';
-
 import React from 'react';
-import DeleteCompanyButton from '@/app/components/company-delate-button';
-import UpdateDescriptionButton from '@/app/components/update-description-button';
+import CompanyDetailsInfo from '@/app/components/company-details-info';
 
 export interface PageProps {
   params: { id: string };
@@ -11,8 +8,7 @@ export interface PageProps {
 export default function Page({ params }: PageProps) {
   return (
     <div className="flex flex-col gap-4 p-4 w-full items-start">
-      <DeleteCompanyButton companyId={params.id} />
-      <UpdateDescriptionButton companyId={params.id} />
+      <CompanyDetailsInfo companyId={params.id}/>
     </div>
   );
 }

@@ -74,12 +74,23 @@ export interface Promotion {
 
 const PROJECT_TOKEN = process.env.NEXT_PUBLIC_PROJECT_TOKEN;
 
-// const buildUrl = (...paths: string[]) =>
-//   `https://${PROJECT_TOKEN}.mockapi.io/api/v1/${paths.join('/')}`;
+const newLocal = (...paths: string[]) => {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  const baseUrl = isDevelopment
+    ? 'http://localhost:3000/api' // Локальна база даних для режиму розробки
+    : 'https://co-crm-api-production.up.railway.app/api'; // Віддалена база даних для продакшену
+
+  return `${baseUrl}/${paths.join('/')}`;
+};
+
 // const buildUrl = (...paths: string[]) =>
 //   `http://localhost:3000/api/${paths.join('/')}`;
-const buildUrl = (...paths: string[]) =>
-  `https://co-crm-api-production.up.railway.app/api/${paths.join('/')}`;
+
+// const buildUrl = (...paths: string[]) =>
+//   `https://co-crm-api-production.up.railway.app/api/${paths.join('/')}`;
+
+const buildUrl = newLocal;
 
 
 const stringifyQueryParams = (params: Record<string, string>) =>
