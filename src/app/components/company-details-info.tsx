@@ -31,7 +31,6 @@ export default function CompanyDetailsInfo({ companyId }: PageProps) {
         <p><strong>Status:</strong> {company.status}</p>
         <p><strong>Joined Date:</strong> {new Date(company.joinedDate).toLocaleDateString('uk')}</p>
       </div>
-
       <div className="mb-4">
         <p><strong>Description:</strong></p>
         <p>{company.description || 'No description provided'}</p>

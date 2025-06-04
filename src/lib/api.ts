@@ -267,6 +267,22 @@ export const updateCompanyDescription = async (
   });
 };
 
+export const updateCompanyStatus = async (
+  companyId: string,
+  newStatus: CompanyStatus, // Передаємо новий статус компанії
+  init?: RequestInit,
+) => {
+  return sendRequestWithLimit<Company>(buildUrl('company', companyId), {
+    ...init,
+    method: 'PATCH',
+    body: JSON.stringify({ status: newStatus }), // Оновлюємо статус компанії
+    headers: {
+      ...(init?.headers || {}),
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
 export const getCompaniesByTitle = async (
   title: string,
   init?: RequestInit,
