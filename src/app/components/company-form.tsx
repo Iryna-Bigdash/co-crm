@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Formik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import * as Yup from 'yup'; 
+import * as Yup from 'yup';
 import {
   CompanyStatus,
   createCompany,
@@ -22,6 +22,7 @@ export type CompanyFieldValues = {
   joinedDate: string;
   categoryId: string;
   countryId: string;
+  avatar: string;
 };
 
 const initialValues: CompanyFieldValues = {
@@ -31,17 +32,17 @@ const initialValues: CompanyFieldValues = {
   joinedDate: '',
   categoryId: '',
   countryId: '',
+  avatar: '',
 };
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('Name is required!'),
   description: Yup.string().required('Description is required!'),
   status: Yup.string().required('Status is required!'),
-  joinedDate: Yup.date()
-    .required('Joined date is required!')
-    .nullable(),
+  joinedDate: Yup.date().required('Joined date is required!').nullable(),
   categoryId: Yup.string().required('Category is required!'),
   countryId: Yup.string().required('Country is required!'),
+  avatar: Yup.string().url('Avatar must be a valid URL').nullable(),
 });
 
 export interface CompanyFormProps {
@@ -52,6 +53,7 @@ export interface CompanyFormProps {
 export default function CompanyForm({ onSubmit }: CompanyFormProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -68,13 +70,17 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
   const mutation = useMutation({
     mutationFn: createCompany,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['companies'] })
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
-      queryClient.invalidateQueries({ queryKey: ['countries', 'with-companies'] })
-      queryClient.invalidateQueries({ queryKey: ['categories', 'with-companies'] })
-      queryClient.invalidateQueries({ queryKey: ['promotions'] })
-      queryClient.invalidateQueries({ queryKey: ['summary-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['summary-sales'] })    
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({
+        queryKey: ['countries', 'with-companies'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['categories', 'with-companies'],
+      });
+      queryClient.invalidateQueries({ queryKey: ['promotions'] });
+      queryClient.invalidateQueries({ queryKey: ['summary-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['summary-sales'] });
       toast.success('Company successfully added!', {
         position: 'top-right',
         autoClose: 3000,
@@ -95,6 +101,7 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
   const handleSubmit = async (values: CompanyFieldValues) => {
     const trimmedValues = {
       ...values,
+      avatar: avatarUrl,
       title: values.title.trim(),
       description: values.description.trim(),
       categoryId: values.categoryId.trim(),
@@ -125,14 +132,22 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
           <p className="mb-0.5 text-xl">Add new company</p>
           <div className="flex gap-6">
             <div className="flex flex-col flex-1 gap-5">
-              <LogoUploader label="Logo" placeholder="Upload photo" />
+              <LogoUploader
+                label="Logo"
+                placeholder="Upload photo"
+                onUpload={(url) => {
+                  setAvatarUrl(url);
+                }}
+              />
               <InputField
                 required
                 label="Status"
                 placeholder="Status"
                 name="status"
                 as="select"
-                error={touched.status && errors.status ? errors.status : undefined}
+                error={
+                  touched.status && errors.status ? errors.status : undefined
+                }
               >
                 {Object.values(CompanyStatus).map((status) => (
                   <option key={status} value={status}>
@@ -146,7 +161,11 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
                 placeholder="Country"
                 name="countryId"
                 as="select"
-                error={touched.countryId && errors.countryId ? errors.countryId : undefined}
+                error={
+                  touched.countryId && errors.countryId
+                    ? errors.countryId
+                    : undefined
+                }
               >
                 {countries?.map((country) => (
                   <option key={country.id} value={country.id}>
@@ -169,7 +188,11 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
                 placeholder="Category"
                 name="categoryId"
                 as="select"
-                error={touched.categoryId && errors.categoryId ? errors.categoryId : undefined}
+                error={
+                  touched.categoryId && errors.categoryId
+                    ? errors.categoryId
+                    : undefined
+                }
               >
                 {categories?.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -182,14 +205,22 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
                 label="Joined date"
                 type="date"
                 name="joinedDate"
-                error={touched.joinedDate && errors.joinedDate ? errors.joinedDate : undefined}
+                error={
+                  touched.joinedDate && errors.joinedDate
+                    ? errors.joinedDate
+                    : undefined
+                }
               />
               <InputField
                 required
                 label="Description"
                 placeholder="Description"
                 name="description"
-                error={touched.description && errors.description ? errors.description : undefined}
+                error={
+                  touched.description && errors.description
+                    ? errors.description
+                    : undefined
+                }
               />
             </div>
           </div>
