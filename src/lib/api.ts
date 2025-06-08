@@ -157,6 +157,28 @@ export const getCategories = async (init?: RequestInit): Promise<Category[]> => 
   }
 };
 
+export async function uploadFile(file: File, companyTitle: string): Promise<string> {
+  const formData = new FormData();
+  formData.append('avatar', file);
+  formData.append('companyTitle', companyTitle);
+
+  const url = buildUrl('upload');
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'File upload failed');
+  }
+
+  const data = await response.json();
+  return data.url;
+}
+
+
+
 export const createCompany = async (
   data: Omit<Company, 'id' | 'hasPromotions'>,
   init?: RequestInit,
@@ -171,6 +193,8 @@ export const createCompany = async (
     },
   });
 };
+
+
 
 export const getCompanies = (init?: RequestInit) => {
   return sendRequestWithLimit<Company[]>(buildUrl('company'), init);
@@ -269,13 +293,13 @@ export const updateCompanyDescription = async (
 
 export const updateCompanyStatus = async (
   companyId: string,
-  newStatus: CompanyStatus, // Передаємо новий статус компанії
+  newStatus: CompanyStatus, 
   init?: RequestInit,
 ) => {
   return sendRequestWithLimit<Company>(buildUrl('company', companyId), {
     ...init,
     method: 'PATCH',
-    body: JSON.stringify({ status: newStatus }), // Оновлюємо статус компанії
+    body: JSON.stringify({ status: newStatus }), 
     headers: {
       ...(init?.headers || {}),
       'Content-Type': 'application/json',

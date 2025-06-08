@@ -1,82 +1,22 @@
-// 'use client';
-
-// import React from 'react';
-// import Image from 'next/image';
-// import clsx from 'clsx';
-
-// export interface LogoUploaderProps
-//   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
-//   label?: string;
-//   square?: boolean;
-// }
-
-// export default function LogoUploader({
-//   square,
-//   label,
-//   placeholder,
-//   id,
-//   ...rest
-// }: LogoUploaderProps) {
-//   return (
-//     <div
-//       className={clsx(
-//         'flex mb-3',
-//         !square && 'gap-10',
-//         square && 'gap-2 flex-col',
-//       )}
-//     >
-//       {label && <p className="text-base color-gray-900">{label}</p>}
-//       <label
-//         htmlFor={id}
-//         className={clsx(
-//           'flex flex-col items-center justify-center h-40 bg-white border border-slate-900 border-dashed cursor-pointer',
-//           !square && 'w-40 rounded-full',
-//           square && 'w-full',
-//         )}
-//       >
-//         <Image
-//           className="mb-1"
-//           width={48}
-//           height={48}
-//           src="/icons/upload.svg"
-//           alt="upload"
-//         />
-//         {placeholder && (
-//           <p className="text-base text-gray-500">{placeholder}</p>
-//         )}
-//         <input
-//           {...rest}
-//           id={id}
-//           type="file"
-//           accept="image/*"
-//           className="hidden"
-//         />
-//       </label>
-//     </div>
-//   );
-// }
-
 'use client';
 
 import React, { useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
-import imageCompression from 'browser-image-compression'; // ⬅️ додано
+import imageCompression from 'browser-image-compression';
 
-export interface LogoUploaderProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'> {
+export interface LogoUploaderProps {
   label?: string;
   square?: boolean;
-  onUpload?: (url: string) => void;
+  placeholder?: string;
+  onSelect?: (file: File) => void;
 }
 
 export default function LogoUploader({
   square,
   label,
   placeholder,
-  id,
-  onUpload,
-  ...rest
+  onSelect,
 }: LogoUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -84,47 +24,20 @@ export default function LogoUploader({
     if (!e.target.files?.length) return;
     const file = e.target.files[0];
 
-    try {
-      // ⬇️ Компресія перед завантаженням
-      const compressedFile = await imageCompression(file, {
-        maxSizeMB: 0.5,
-        maxWidthOrHeight: 1024,
-        useWebWorker: true,
-      });
+    const compressedFile = await imageCompression(file, {
+      maxSizeMB: 0.5,
+      maxWidthOrHeight: 1024,
+      useWebWorker: true,
+    });
 
-      // Прев’ю локальне
-      setPreview(URL.createObjectURL(compressedFile));
-
-      const formData = new FormData();
-      formData.append('file', compressedFile);
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error('Upload failed');
-
-      const data = await res.json();
-
-      if (onUpload) onUpload(data.path);
-    } catch (error) {
-      console.error('File upload error:', error);
-      // TODO: Вивести toast або повідомлення
-    }
+    setPreview(URL.createObjectURL(compressedFile));
+    if (onSelect) onSelect(compressedFile); 
   };
 
   return (
-    <div
-      className={clsx(
-        'flex mb-3',
-        !square && 'gap-10',
-        square && 'gap-2 flex-col',
-      )}
-    >
+    <div className={clsx('flex mb-3', !square && 'gap-10', square && 'gap-2 flex-col')}>
       {label && <p className="text-base color-gray-900">{label}</p>}
       <label
-        htmlFor={id}
         className={clsx(
           'flex flex-col items-center justify-center h-40 bg-white border border-slate-900 border-dashed cursor-pointer',
           !square && 'w-40 rounded-full',
@@ -140,21 +53,11 @@ export default function LogoUploader({
           />
         ) : (
           <>
-            <Image
-              className="mb-1"
-              width={48}
-              height={48}
-              src="/icons/upload.svg"
-              alt="upload"
-            />
-            {placeholder && (
-              <p className="text-base text-gray-500">{placeholder}</p>
-            )}
+            <Image width={48} height={48} src="/icons/upload.svg" alt="upload" />
+            {placeholder && <p className="text-base text-gray-500">{placeholder}</p>}
           </>
         )}
         <input
-          {...rest}
-          id={id}
           type="file"
           accept="image/*"
           className="hidden"
@@ -164,3 +67,4 @@ export default function LogoUploader({
     </div>
   );
 }
+
