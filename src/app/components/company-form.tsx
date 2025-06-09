@@ -122,10 +122,13 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
         const renamedFile = new File(
           [compressedFile],
           `${values.title.replace(/\s+/g, '_')}_${Date.now()}.jpg`,
-          { type: values.avatarFile.type }
+          { type: 'image/jpeg' }
         );
 
         avatarUrl = await uploadFile(renamedFile, values.title);
+        console.log('Uploading file:', renamedFile.name, renamedFile.size);
+        console.log('avatarUrl:', avatarUrl);
+
       } catch (error) {
         toast.error('Failed to upload avatar');
         return;
@@ -142,6 +145,8 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
       avatar: avatarUrl,
       hasPromotions: false,
     };
+
+    console.log('payload:', payload)
 
     await mutation.mutateAsync(payload);
 

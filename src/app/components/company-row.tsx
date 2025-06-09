@@ -28,6 +28,10 @@ export default function CompanyRow({ company }: CompanyRowProps) {
     title: company.categoryTitle || "No Category",
   };
 
+  const avatarUrl = company.avatar
+    ? `${process.env.NEXT_PUBLIC_API_URL}${company.avatar}`
+    : '/images/company-avatar.png';
+
   return (
     <tr className="h-14 text-center text-gray-900 bg-white">
       <td
@@ -41,9 +45,9 @@ export default function CompanyRow({ company }: CompanyRowProps) {
       <td className="w-56 pl-10">
         <div className="flex items-center gap-4">
           <div className="inline-block">
-            {company.avatar ? (
+            {avatarUrl ? (
               <Image
-                src={company.avatar}
+                src={avatarUrl}
                 alt="company avatar"
                 width={32}
                 height={32}

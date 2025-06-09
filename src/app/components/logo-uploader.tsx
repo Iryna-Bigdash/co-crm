@@ -31,6 +31,7 @@ export default function LogoUploader({
     });
 
     setPreview(URL.createObjectURL(compressedFile));
+    
     if (onSelect) onSelect(compressedFile); 
   };
 

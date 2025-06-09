@@ -174,10 +174,10 @@ export async function uploadFile(file: File, companyTitle: string): Promise<stri
   }
 
   const data = await response.json();
-  return data.url;
+  console.log('data:', data);
+  console.log('data URL:', data.path)
+  return data.path;
 }
-
-
 
 export const createCompany = async (
   data: Omit<Company, 'id' | 'hasPromotions'>,
