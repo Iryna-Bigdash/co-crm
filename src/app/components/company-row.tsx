@@ -11,14 +11,14 @@ export interface CompanyRowProps {
 }
 
 const borderColorClasses: Record<string, string> = {
-  '1': 'border-emerald-400',
-  '2': 'border-red-400',
-  '3': 'border-orange-400',
-  '4': 'border-yellow-400',
-  '5': 'border-purple-400',
-  '6': 'border-rose-400',
-  '7': 'border-indigo-400',
-  '8': 'border-lime-400',
+  'Trade': 'border-emerald-400',
+  'Product': 'border-red-400',
+  'Healthcare': 'border-orange-400',
+  'IT': 'border-yellow-400',
+  'Finance': 'border-purple-400',
+  'Energy': 'border-rose-400',
+  'Construction': 'border-indigo-400',
+  'Tourism': 'border-lime-400',
 };
 
 export default function CompanyRow({ company }: CompanyRowProps) {
@@ -27,6 +27,9 @@ export default function CompanyRow({ company }: CompanyRowProps) {
     id: company.categoryId,
     title: company.categoryTitle || "No Category",
   };
+
+  const categoryColor = borderColorClasses[company.categoryTitle ?? ''] || 'border-gray-300';
+
 
   const avatarUrl = company.avatar
     ? `${process.env.NEXT_PUBLIC_API_URL}${company.avatar}`
@@ -37,7 +40,7 @@ export default function CompanyRow({ company }: CompanyRowProps) {
       <td
         className={clsx(
           'text-xs font-medium rounded-l border-l-4',
-          borderColorClasses[company.categoryId],
+          categoryColor,
         )}
       >
         <CategoriesLabel category={category}/>
@@ -51,7 +54,7 @@ export default function CompanyRow({ company }: CompanyRowProps) {
                 alt="company avatar"
                 width={32}
                 height={32}
-                objectFit="cover"
+                style={{ objectFit: 'cover' }}
                 className="rounded-full"
               />
             ) : (
@@ -60,7 +63,7 @@ export default function CompanyRow({ company }: CompanyRowProps) {
                 alt="default company avatar"
                 width={32}
                 height={32}
-                objectFit="cover"
+                style={{ objectFit: 'cover' }}
                 className="rounded-full"
               />
             )}

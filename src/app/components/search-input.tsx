@@ -34,6 +34,7 @@ export default function SearchInput() {
       <input
         type="text"
         value={searchQuery}
+        placeholder='Enter company name'
         onChange={handleChange}
         className="text-sm flex-1 py-3 pl-3 pr-11 w-full h-11 rounded border border-gray-300 bg-gray-50"
       />
