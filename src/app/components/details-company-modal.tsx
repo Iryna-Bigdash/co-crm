@@ -21,6 +21,7 @@ export default function DetailsCompanyModal({
         <div className='flex flex-col gap-3 items-start'>
         <div className="flex flex-col gap-4 p-4 w-full items-start">
       <CompanyDetailsInfo companyId={companyId}/>
+      {/* <DelateCompanyButton companyId={companyId}/> */}
     </div>
       </div>
     </Modal>

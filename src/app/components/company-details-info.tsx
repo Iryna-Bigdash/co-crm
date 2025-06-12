@@ -40,7 +40,7 @@ export default function CompanyDetailsInfo({ companyId }: PageProps) {
       </div>
 
       <div className="flex flex-col items-end gap-3 pt-6 border-t border-gray-200 mt-6">
-        <UpdateDescriptionButton companyId={companyId} />
+        {/* <UpdateDescriptionButton companyId={companyId} /> */}
         <DeleteCompanyButton companyId={companyId} />
       </div>
     </div>
