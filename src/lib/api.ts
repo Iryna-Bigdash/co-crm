@@ -194,8 +194,6 @@ export const createCompany = async (
   });
 };
 
-
-
 export const getCompanies = (init?: RequestInit) => {
   return sendRequestWithLimit<Company[]>(buildUrl('company'), init);
 };

@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import DeleteCompanyButton from '@/app/components/company-delate-button';
-import UpdateDescriptionButton from '@/app/components/update-description-button';
 import { useQuery } from '@tanstack/react-query';
 import { getCompany } from '@/lib/api';
 
@@ -40,7 +39,6 @@ export default function CompanyDetailsInfo({ companyId }: PageProps) {
       </div>
 
       <div className="flex flex-col items-end gap-3 pt-6 border-t border-gray-200 mt-6">
-        {/* <UpdateDescriptionButton companyId={companyId} /> */}
         <DeleteCompanyButton companyId={companyId} />
       </div>
     </div>

@@ -47,24 +47,24 @@ export default function CompanyRow({ company }: CompanyRowProps) {
       </td>
       <td className="w-56 pl-10">
         <div className="flex items-center gap-4">
-          <div className="inline-block">
+          <div className="inline-block relative w-8 h-8 rounded-full bg-blue-500">
             {avatarUrl ? (
               <Image
                 src={avatarUrl}
-                alt="company avatar"
-                width={32}
-                height={32}
+                alt={`${company.title}`}
                 style={{ objectFit: 'cover' }}
                 className="rounded-full"
+                fill
+                sizes="32px"
               />
             ) : (
               <Image
                 src="/images/company-avatar.png"
                 alt="default company avatar"
-                width={32}
-                height={32}
                 style={{ objectFit: 'cover' }}
                 className="rounded-full"
+                fill
+                sizes="32px"
               />
             )}
           </div>
