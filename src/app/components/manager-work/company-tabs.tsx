@@ -68,3 +68,5 @@ export default function CompanyTabs({ companyId }: CompanyTabsProps) {
     </div>
   );
 }
+
+

@@ -97,6 +97,7 @@ import getQueryClient from '@/lib/utils/getQueryClient';
 import CompanyInfo from '@/app/components/company-info';
 import CompanyPromotions from '@/app/components/company-promotions';
 import CompanyTabs from '@/app/components/manager-work/company-tabs';
+import InteractionCard from '@/app/components/manager-work/interaction-card';
 
 export interface PageProps {
   params: { id: string };
@@ -153,14 +154,17 @@ export default async function Page({ params }: PageProps) {
   return (
     <HydrationBoundary state={dehydratedState}>
       <div className="py-6 px-10 grid grid-cols-12 gap-5">
-        <div className="col-span-3">
+        {/* <div className="col-span-3">
           <CompanyInfo companyId={params.id} />
         </div>
 
         <div className="col-span-9 space-y-6">
           <CompanyTabs companyId={params.id} />
           <CompanyPromotions companyId={params.id} />
-        </div>
+        </div> */}
+        <div className="col-span-9 space-y-6">
+     <CompanyPromotions companyId={params.id} />
+     </div>
       </div>
     </HydrationBoundary>
   );

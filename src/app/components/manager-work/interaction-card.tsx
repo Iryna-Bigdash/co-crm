@@ -375,4 +375,131 @@
 
 // export default CRMInterface;
 
-                       
+// InteractionCard.tsx
+
+'use client';
+
+import React from 'react';
+import {
+  Phone,
+  Send,
+  Calendar,
+  MessageSquare,
+  Clock,
+  DollarSign,
+  CheckCircle,
+  AlertCircle
+} from 'lucide-react';
+
+
+export type InteractionType = 'call' | 'email' | 'meeting' | 'other';
+export type InteractionStatus = 'completed' | 'pending' | 'overdue';
+
+export interface Interaction {
+  id: string;
+  type: InteractionType;
+  status: InteractionStatus;
+  date: string;
+  comment: string;
+  nextCall?: string;
+  amount?: number;
+}
+
+interface InteractionCardProps {
+  companyId: string;
+}
+
+const statusMap: Record<InteractionStatus, {
+  label: string;
+  icon: React.ReactNode;
+  className: string;
+}> = {
+  completed: {
+    label: 'Завершено',
+    icon: <CheckCircle size={14} className="text-green-600" />,
+    className: 'bg-green-50 text-green-700'
+  },
+  pending: {
+    label: 'В процесі',
+    icon: <AlertCircle size={14} className="text-yellow-600" />,
+    className: 'bg-yellow-50 text-yellow-700'
+  },
+  overdue: {
+    label: 'Прострочено',
+    icon: <AlertCircle size={14} className="text-red-600" />,
+    className: 'bg-red-50 text-red-700'
+  }
+};
+
+const typeMap: Record<InteractionType, {
+  label: string;
+  icon: React.ReactNode;
+}> = {
+  call: {
+    label: 'Дзвінок',
+    icon: <Phone size={16} className="text-blue-600" />
+  },
+  email: {
+    label: 'Email',
+    icon: <Send size={16} className="text-purple-600" />
+  },
+  meeting: {
+    label: 'Зустріч',
+    icon: <Calendar size={16} className="text-indigo-600" />
+  },
+  other: {
+    label: 'Інше',
+    icon: <MessageSquare size={16} className="text-gray-600" />
+  }
+};
+
+export default function InteractionCard({ companyId }: InteractionCardProps) {
+    const interaction: Interaction = {
+        id: 'default-id',
+        type: 'call',
+        status: 'pending',
+        date: new Date().toISOString(),
+        comment: 'Стандартний коментар',
+      };
+
+  const status = statusMap[interaction.status] || statusMap.pending;
+  const type = typeMap[interaction.type] || typeMap.other;
+
+  return (
+    <div className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2 text-sm text-gray-700">
+          {type.icon}
+          <span className="font-medium">
+            {new Date(interaction.date).toLocaleDateString('uk-UA')}
+          </span>
+        </div>
+
+        <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.className}`}>
+          {status.icon}
+          <span>{status.label}</span>
+        </div>
+      </div>
+
+      <p className="text-sm text-gray-800 mb-3">{interaction.comment}</p>
+
+      <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2">
+        {interaction.nextCall && (
+          <div className="flex items-center gap-1 text-blue-600">
+            <Clock size={14} />
+            <span>
+              Наступний звʼязок: {new Date(interaction.nextCall).toLocaleDateString('uk-UA')}
+            </span>
+          </div>
+        )}
+
+        {interaction.amount && interaction.amount > 0 && (
+          <div className="flex items-center gap-1 text-green-600 font-medium">
+            <DollarSign size={14} />
+            <span>{interaction.amount.toLocaleString()} грн</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
