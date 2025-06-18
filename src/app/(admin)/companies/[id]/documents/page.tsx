@@ -1,4 +1,4 @@
-import InteractionSection from '@/app/components/manager-work/interaction-card';
+import { DocumentsSection } from '@/app/components/manager-work/documents-section';
 import React from 'react';
 
 export interface PageProps {
@@ -8,7 +8,7 @@ export interface PageProps {
 export default function Page({ params }: PageProps) {
   return (
     <div className="p-4 w-full items-start">
-      <InteractionSection 
+      <DocumentsSection 
       companyId={params.id} />
     </div>
   );

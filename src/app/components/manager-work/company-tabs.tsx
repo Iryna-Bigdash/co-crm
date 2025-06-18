@@ -32,7 +32,7 @@ const tabs = [
   },
   {
     label: 'Contract',
-    href: (id: string) => `/companies/${id}/contract`,
+    href: (id: string) => `/companies/${id}/contracts`,
     icon: Pencil,
   },
 ];

@@ -390,7 +390,7 @@ import {
   CheckCircle,
   AlertCircle
 } from 'lucide-react';
-
+import InteractionForm from './interection-form';
 
 export type InteractionType = 'call' | 'email' | 'meeting' | 'other';
 export type InteractionStatus = 'completed' | 'pending' | 'overdue';
@@ -406,7 +406,7 @@ export interface Interaction {
 }
 
 interface InteractionCardProps {
-  companyId: string;
+  interaction: Interaction;
 }
 
 const statusMap: Record<InteractionStatus, {
@@ -453,19 +453,20 @@ const typeMap: Record<InteractionType, {
   }
 };
 
-export default function InteractionCard({ companyId }: InteractionCardProps) {
-    const interaction: Interaction = {
-        id: 'default-id',
-        type: 'call',
-        status: 'pending',
-        date: new Date().toISOString(),
-        comment: 'Стандартний коментар',
-      };
-
+export function InteractionCard({ interaction }: InteractionCardProps) {
   const status = statusMap[interaction.status] || statusMap.pending;
   const type = typeMap[interaction.type] || typeMap.other;
 
   return (
+    <div>
+        <div className="relative my-10">
+      <div className="absolute inset-0 flex items-center">
+        <div className="w-full border-t border-gray-300" />
+      </div>
+      <div className="relative flex justify-center text-sm text-gray-500 uppercase">
+        <span className="bg-white px-3">Історія взаємодій</span>
+      </div>
+    </div>
     <div className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 text-sm text-gray-700">
@@ -501,5 +502,34 @@ export default function InteractionCard({ companyId }: InteractionCardProps) {
         )}
       </div>
     </div>
+    </div>
+  );
+}
+
+interface InteractionSectionProps {
+  companyId: string;
+}
+
+export default function InteractionSection({ companyId }: InteractionSectionProps) {
+  // Можна сюди додати useState для зберігання interaction, якщо потрібно
+
+  const defaultInteraction: Interaction = {
+    id: 'default-id',
+    type: 'call',
+    status: 'pending',
+    date: new Date().toISOString(),
+    comment: 'Стандартний коментар',
+  };
+
+  const handleFormSubmit = (data: any) => {
+    // Тут відправка на бекенд або оновлення локального стану
+    console.log('Interaction submitted:', data);
+  };
+
+  return (
+    <>
+      <InteractionForm onSubmit={handleFormSubmit} />
+      <InteractionCard interaction={defaultInteraction} />
+    </>
   );
 }
