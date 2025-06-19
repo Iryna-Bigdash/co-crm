@@ -21,7 +21,7 @@ interface ContractModalProps {
   onSave: (contract: Contract) => void;
 }
 
-export function ContractModal({ contract, isOpen, onClose, onSave }: ContractModalProps) {
+export function ContractEditModal({ contract, isOpen, onClose, onSave }: ContractModalProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const formik = useFormik({

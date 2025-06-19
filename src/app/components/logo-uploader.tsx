@@ -46,7 +46,7 @@ export default function LogoUploader({
         )}
       >
         {preview ? (
-          <img
+          <Image
             src={preview}
             alt="preview"
             className={clsx(!square ? 'rounded-full' : 'rounded-md')}

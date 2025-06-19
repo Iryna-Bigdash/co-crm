@@ -22,8 +22,16 @@ const nextConfig = {
       },
     ],
   },
-  
+
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.(ttf|otf|woff|woff2|eot)$/,
+      type: 'asset/resource',
+    });
+    return config;
+  }
 };
+  
 
 export default nextConfig;
 
