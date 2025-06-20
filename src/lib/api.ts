@@ -179,6 +179,28 @@ export async function uploadFile(file: File, companyTitle: string): Promise<stri
   return data.path;
 }
 
+export async function uploadDocuments(file: File, companyTitle: string, documentNumber?: string): Promise<string> {
+  const formData = new FormData();
+  formData.append('documents', file);
+  formData.append('companyTitle', companyTitle);
+  if (documentNumber) formData.append('documentNumber', documentNumber);
+
+  const url = buildUrl('documents');
+
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'File upload failed');
+  }
+
+  const data = await response.json();
+  return data.path;
+}
+
 export const createCompany = async (
   data: Omit<Company, 'id' | 'hasPromotions'>,
   init?: RequestInit,
