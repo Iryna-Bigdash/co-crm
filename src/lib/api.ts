@@ -72,6 +72,11 @@ export interface Promotion {
   avatar?: string;
 }
 
+interface CompanyDocument {
+  filename: string;
+  url: string;
+}
+
 const PROJECT_TOKEN = process.env.NEXT_PUBLIC_PROJECT_TOKEN;
 
 const newLocal = (...paths: string[]) => {
@@ -179,9 +184,15 @@ export async function uploadFile(file: File, companyTitle: string): Promise<stri
   return data.path;
 }
 
-export async function uploadDocuments(file: File, companyTitle: string, documentNumber?: string): Promise<string> {
+export async function uploadDocuments(
+  file: File,
+  companyId: string,
+  companyTitle: string,
+  documentNumber?: string
+): Promise<string> {
   const formData = new FormData();
   formData.append('documents', file);
+  formData.append('companyId', companyId);
   formData.append('companyTitle', companyTitle);
   if (documentNumber) formData.append('documentNumber', documentNumber);
 
@@ -200,6 +211,23 @@ export async function uploadDocuments(file: File, companyTitle: string, document
   const data = await response.json();
   return data.path;
 }
+
+export const getCompanyDocuments = async (
+  companyId: string
+): Promise<CompanyDocument[]> => {
+  const response = await fetch(`http://localhost:3000/api/documents/company/${companyId}`);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || 'Не вдалося отримати список документів компанії');
+  }
+
+  return await response.json();
+};
+export const deleteDocument = async (filename: string) => {
+  const res = await fetch(`/documents/${filename}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Помилка при видаленні файлу');
+};
 
 export const createCompany = async (
   data: Omit<Company, 'id' | 'hasPromotions'>,

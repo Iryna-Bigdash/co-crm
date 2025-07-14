@@ -29,7 +29,7 @@ export function DocumentUploadForm({ companyId, companyTitle }: DocumentUploadFo
 
     try {
       setUploading(true);
-      const path = await uploadDocuments(file, companyTitle, documentNumber);
+      const path = await uploadDocuments(file,companyId, companyTitle, documentNumber);
       setUploadedPath(path);
     } catch (err: any) {
       setError(err.message || 'Помилка завантаження файлу');
