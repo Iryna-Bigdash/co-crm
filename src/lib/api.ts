@@ -188,13 +188,13 @@ export async function uploadDocuments(
   file: File,
   companyId: string,
   companyTitle: string,
-  documentNumber?: string
+  documentName?: string
 ): Promise<string> {
   const formData = new FormData();
   formData.append('documents', file);
   formData.append('companyId', companyId);
   formData.append('companyTitle', companyTitle);
-  if (documentNumber) formData.append('documentNumber', documentNumber);
+  if (documentName) formData.append('documentName', documentName);
 
   const url = buildUrl('documents');
 
@@ -224,6 +224,7 @@ export const getCompanyDocuments = async (
 
   return await response.json();
 };
+
 export const deleteDocument = async (filename: string) => {
   const res = await fetch(`/documents/${filename}`, { method: 'DELETE' });
   if (!res.ok) throw new Error('Помилка при видаленні файлу');

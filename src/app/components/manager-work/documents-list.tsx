@@ -51,7 +51,6 @@ export function DocumentsList({ companyId }: DocumentsListProps) {
 
   return (
     <>
-      <p className="text-sm text-gray-700 mb-2">📄 Секція з документами</p>
       <ul className="space-y-3 mb-6">
         {documents.map((doc) => (
           <li
