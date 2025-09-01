@@ -3,11 +3,15 @@
 import React from 'react';
 import {
   Phone, Send, Calendar, MessageSquare,
-  Clock, DollarSign, CheckCircle, AlertCircle
+  Clock, DollarSign, CheckCircle, AlertCircle, Trash2
 } from 'lucide-react';
 import type { Interaction as ApiInteraction } from '@/lib/api';
+import DeleteConfirmation from '@/app/components/delete-comfirm-window';
 
-type Props = { interaction: ApiInteraction };
+type Props = {
+  interaction: ApiInteraction;
+  onDelete?: (id: string) => Promise<void>;
+};
 
 const TYPE_ICON: Record<ApiInteraction['type'], React.ReactNode> = {
   CALL: <Phone size={14} />,
@@ -22,7 +26,7 @@ const STATUS_META: Record<ApiInteraction['status'], { label: string; className: 
   CANCELED: { label: 'Скасовано',   className: 'bg-red-100 text-red-800',       icon: <AlertCircle size={14} /> },
 };
 
-export default function InteractionCard({ interaction }: Props) {
+export default function InteractionCard({ interaction, onDelete }: Props) {
   const tIcon = TYPE_ICON[interaction.type];
   const sMeta = STATUS_META[interaction.status];
 
@@ -36,9 +40,24 @@ export default function InteractionCard({ interaction }: Props) {
           </span>
         </div>
 
-        <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${sMeta.className}`}>
-          {sMeta.icon}
-          <span>{sMeta.label}</span>
+        <div className="flex items-center gap-2">
+          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${sMeta.className}`}>
+            {sMeta.icon}
+            <span>{sMeta.label}</span>
+          </div>
+
+          {onDelete && (
+            <DeleteConfirmation
+              id={interaction.id}
+              companyId={interaction.companyId}
+              text="Видалити цей запис взаємодії?"
+              onDelete={onDelete} 
+            >
+              <button title="Видалити" className="p-1 rounded hover:bg-gray-100">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </DeleteConfirmation>
+          )}
         </div>
       </div>
 
@@ -48,7 +67,17 @@ export default function InteractionCard({ interaction }: Props) {
         {interaction.nextCall && (
           <div className="flex items-center gap-1 text-blue-600">
             <Clock size={14} />
-            <span>Наступний звʼязок: {new Date(interaction.nextCall).toLocaleString('uk-UA')}</span>
+            <span>
+              Наступний звʼязок:{' '}
+              {new Date(interaction.nextCall).toLocaleString('uk-UA', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              })}
+            </span>
           </div>
         )}
 

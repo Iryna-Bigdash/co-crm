@@ -1,4 +1,3 @@
-// components/access-notification.tsx
 'use client';
 
 import React from 'react';

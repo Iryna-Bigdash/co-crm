@@ -415,4 +415,13 @@ export const getInteractionsForCompany = async (
   );
 };
 
+export const deleteInteraction = async (id: string, init?: RequestInit) => {
+  return sendRequestWithLimit<Interaction>(buildUrl('Interactions', id), {
+    ...init,
+    method: 'DELETE',
+    headers: {
+      ...(init?.headers || {}),
+    },
+  });
+};
 

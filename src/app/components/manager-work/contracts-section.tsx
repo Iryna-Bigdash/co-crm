@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { ContractEditModal } from './contract-edit-modal';
 import { AddContractModal } from './contract-add';
 import { ContractPreviewModal } from './contract-preview-modal';
-import { ContractCard } from './contact-card';
+import { ContractCard } from './contract-card';
 
 interface ContractsProps {
   companyId: string;

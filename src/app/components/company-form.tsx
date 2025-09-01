@@ -12,9 +12,8 @@ import { createInteraction } from '@/lib/api';
 import type { Interaction } from '@/lib/api';
 import Button from './button';
 
-// Бекенд очікує UPPERCASE:
-type InteractionType = Interaction['type'];       // 'CALL' | 'EMAIL' | 'MEETING' | 'OTHER'
-type InteractionStatus = Interaction['status'];   // 'PENDING' | 'DONE' | 'CANCELED' | 'CALLBACK'
+type InteractionType = Interaction['type'];     
+type InteractionStatus = Interaction['status'];   
 
 const TYPE_LABELS: Record<InteractionType, string> = {
   CALL: 'Дзвінок',
@@ -73,7 +72,6 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
     },
     onSuccess: () => {
       toast.success('Запис додано');
-      // оновлюємо історію
       queryClient.invalidateQueries({ queryKey: ['interactions', 'company', companyId] });
       formik.resetForm();
     },
