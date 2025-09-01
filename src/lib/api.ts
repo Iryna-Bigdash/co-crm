@@ -61,7 +61,6 @@ export interface Company {
   countryTitle?: string; 
   avatar?: string;
 }
-
 export interface Promotion {
   id: string;
   title: string;
@@ -70,6 +69,29 @@ export interface Promotion {
   companyId: string;
   companyTitle?: string;
   avatar?: string;
+}
+
+// interactions
+export type InteractionType = 'CALL' | 'EMAIL' | 'MEETING' | 'OTHER';
+export type InteractionStatus = 'PENDING' | 'DONE' | 'CANCELED' ;
+
+export interface Interaction {
+  id: string;
+  companyId: string;
+  type: InteractionType;
+  status: InteractionStatus;
+  date: string;               // ISO
+  comment: string;
+  nextCall?: string | null;   // ISO
+  amount?: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface InteractionsListResponse {
+  items: Interaction[];
+  total: number;
+  skip: number;
+  take: number;
 }
 
 interface CompanyDocument {
@@ -365,3 +387,32 @@ export const getCompaniesByTitle = async (
     init,
   );
 };
+
+// interections
+export const createInteraction = async (
+  companyId: string,
+  data: Omit<Interaction, 'id' | 'companyId' | 'createdAt' | 'updatedAt'>,
+  init?: RequestInit,
+) => {
+  return sendRequestWithLimit<Interaction>(buildUrl('interactions','company', companyId), {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      ...(init?.headers || {}),
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const getInteractionsForCompany = async (
+  companyId: string,
+  init?: RequestInit
+) => {
+  return sendRequestWithLimit<InteractionsListResponse>(
+    buildUrl('interactions', 'company', companyId),
+    init
+  );
+};
+
+

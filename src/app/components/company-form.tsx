@@ -1,262 +1,203 @@
+'use client';
+
 import React from 'react';
-import { Form, Formik } from 'formik';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import {
-  CompanyStatus,
-  createCompany,
-  getCategories,
-  getCountries,
-  uploadFile,
-} from '@/lib/api';
-import Button from '@/app/components/button';
-import InputField from '@/app/components/input-field';
-import LogoUploader from '@/app/components/logo-uploader';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { isToday } from 'date-fns';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';
-import imageCompression from 'browser-image-compression';
+import { createInteraction } from '@/lib/api';
+import type { Interaction } from '@/lib/api';
+import Button from './button';
 
-export type CompanyFieldValues = {
-  title: string;
-  description: string;
-  status: CompanyStatus;
-  joinedDate: string;
-  categoryId: string;
-  countryId: string;
-  avatar: string;
-  avatarFile?: File | null;
+// Бекенд очікує UPPERCASE:
+type InteractionType = Interaction['type'];       // 'CALL' | 'EMAIL' | 'MEETING' | 'OTHER'
+type InteractionStatus = Interaction['status'];   // 'PENDING' | 'DONE' | 'CANCELED' | 'CALLBACK'
+
+const TYPE_LABELS: Record<InteractionType, string> = {
+  CALL: 'Дзвінок',
+  EMAIL: 'Email',
+  MEETING: 'Зустріч',
+  OTHER: 'Інше',
 };
 
-const initialValues: CompanyFieldValues = {
-  title: '',
-  description: '',
-  status: CompanyStatus.Active,
-  joinedDate: '',
-  categoryId: '',
-  countryId: '',
-  avatar: '',
+const STATUS_LABELS: Record<InteractionStatus, string> = {
+  PENDING: 'В процесі',
+  DONE: 'Завершено',
+  CANCELED: 'Скасовано',
 };
 
-const validationSchema = Yup.object().shape({
-  title: Yup.string().required('Name is required!'),
-  description: Yup.string().required('Description is required!'),
-  status: Yup.string().required('Status is required!'),
-  joinedDate: Yup.date().required('Joined date is required!').nullable(),
-  categoryId: Yup.string().required('Category is required!'),
-  countryId: Yup.string().required('Country is required!'),
-  avatar: Yup.string().url('Avatar must be a valid URL').nullable().notRequired(),
-  avatarFile: Yup.mixed()
-  .test('fileType', 'File must be JPG, PNG або WEBP', (value) => {
-    if (!value) return true;
-    const file = value as File;
-    return ['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
-  })
-  .test('fileSize', 'File is too large. Max 2MB', (value) => {
-    if (!value) return true;
-    const file = value as File;
-    return file.size <= 2 * 1024 * 1024;
-  }),
+const validationSchema = Yup.object({
+  type: Yup.mixed<InteractionType>()
+    .oneOf(Object.keys(TYPE_LABELS) as InteractionType[])
+    .required('Оберіть тип звʼязку'),
+  status: Yup.mixed<InteractionStatus>()
+    .oneOf(Object.keys(STATUS_LABELS) as InteractionStatus[])
+    .required('Оберіть статус'),
+  comment: Yup.string().trim().required('Коментар обовʼязковий'),
+  nextCall: Yup.date()
+    .nullable()
+    .min(new Date(), 'Дата і час не можуть бути в минулому')
+    .required('Дата і час обовʼязкові'),
+  amount: Yup.number().min(0, 'Сума має бути невідʼємною').nullable(),
 });
 
-export interface CompanyFormProps {
-  onSubmit?: (values: CompanyFieldValues) => void | Promise<void>;
-  onClose?: () => void;
+type FormValues = {
+  type: '' | InteractionType;
+  status: '' | InteractionStatus;
+  comment: string;
+  nextCall: Date | null;
+  amount: number | null;
+};
+
+function toIso(v: Date | null) {
+  return v ? v.toISOString() : null;
 }
 
-export default function CompanyForm({ onSubmit }: CompanyFormProps) {
+export default function InteractionForm({ companyId }: { companyId: string }) {
   const queryClient = useQueryClient();
-  const router = useRouter();
-
-  const { data: categories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: getCategories,
-    retry: false,
-    staleTime: 10 * 1000,
-  });
-
-  const { data: countries, isLoading: isCountriesLoading } = useQuery({
-    queryKey: ['countries'],
-    queryFn: getCountries,
-    staleTime: 10 * 1000,
-  });
 
   const mutation = useMutation({
-    mutationFn: createCompany,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['companies'] });
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-      queryClient.invalidateQueries({ queryKey: ['countries', 'with-companies'] });
-      queryClient.invalidateQueries({ queryKey: ['categories', 'with-companies'] });
-      queryClient.invalidateQueries({ queryKey: ['promotions'] });
-      queryClient.invalidateQueries({ queryKey: ['summary-stats'] });
-      queryClient.invalidateQueries({ queryKey: ['summary-sales'] });
-      toast.success('Company successfully added!', {
-        position: 'top-right',
-        autoClose: 3000,
-      });
-      router.push('/companies');
+    mutationFn: async (values: FormValues) => {
+      const payload = {
+        type: values.type as InteractionType,
+        status: values.status as InteractionStatus,
+        date: new Date().toISOString(),      // час створення interaction
+        comment: values.comment.trim(),
+        nextCall: toIso(values.nextCall),     // або null
+        amount: values.amount,                // може бути null
+      };
+      return createInteraction(companyId, payload);
     },
-    onError: (error: any) => {
-      console.error('Company not added:', error);
-      toast.error('Company not added!');
+    onSuccess: () => {
+      toast.success('Запис додано');
+      // оновлюємо історію
+      queryClient.invalidateQueries({ queryKey: ['interactions', 'company', companyId] });
+      formik.resetForm();
+    },
+    onError: (e: any) => {
+      console.error(e);
+      toast.error(e?.message || 'Не вдалося додати запис');
     },
   });
 
-  const handleSubmit = async (values: CompanyFieldValues) => {
-    let avatarUrl = values.avatar;
+  const formik = useFormik<FormValues>({
+    initialValues: {
+      type: '',
+      status: '',
+      comment: '',
+      nextCall: null,
+      amount: null,
+    },
+    validationSchema,
+    onSubmit: (vals) => mutation.mutate(vals),
+  });
 
-    if (values.avatarFile) {
-      try {
-        console.log('Original file size:', values.avatarFile.size / 1024, 'KB');
-
-        const compressedFile = await imageCompression(values.avatarFile, {
-          maxSizeMB: 0.5,
-          maxWidthOrHeight: 1024,
-          useWebWorker: true,
-           initialQuality: 0.7,
-           fileType: 'image/jpeg',
-        });
-
-        console.log('Compressed file size:', compressedFile.size / 1024, 'KB');
-
-        const renamedFile = new File(
-          [compressedFile],
-          `${values.title.replace(/\s+/g, '_')}_${Date.now()}.jpg`,
-          { type: 'image/jpeg' }
-        );
-
-        avatarUrl = await uploadFile(renamedFile, values.title);
-        console.log('Uploading file:', renamedFile.name, renamedFile.size);
-        console.log('avatarUrl:', avatarUrl);
-
-      } catch (error) {
-        toast.error('Failed to upload avatar');
-        return;
-      }
-    }
-
-    const { avatarFile, ...rest } = values;
-
-    const payload = {
-      ...rest,
-      title: values.title.trim(),
-      description: values.description.trim(),
-      joinedDate: new Date(values.joinedDate).toISOString(),
-      avatar: avatarUrl,
-      hasPromotions: false,
-    };
-
-    console.log('payload:', payload)
-
-    await mutation.mutateAsync(payload);
-
-    if (onSubmit) {
-      onSubmit(payload);
-    }
-  };
-
-  if (isCountriesLoading) {
-    return <div>Loading countries...</div>;
-  }
+  const minDate = new Date();
+  const minTime =
+    formik.values.nextCall && isToday(formik.values.nextCall)
+      ? new Date()
+      : new Date(new Date().setHours(0, 0, 0, 0));
+  const maxTime = new Date(new Date().setHours(23, 45, 0, 0));
 
   return (
-    <Formik<CompanyFieldValues>
-      initialValues={initialValues}
-      validationSchema={validationSchema}
-      onSubmit={handleSubmit}
-    >
-      {({ values, errors, touched, setFieldValue }) => (
-        <Form className="flex flex-col gap-10">
-          <p className="mb-0.5 text-xl">Add new company</p>
-          <div className="flex gap-6">
-            <div className="flex flex-col flex-1 gap-5">
+    <form onSubmit={formik.handleSubmit} className="mb-4 p-4 border border-gray-200 rounded-xl bg-white shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
+        <div>
+          <select
+            name="type"
+            value={formik.values.type}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="border border-gray-300 rounded-lg px-3 py-2 w-full"
+          >
+            <option value="">Тип звʼязку</option>
+            {(Object.keys(TYPE_LABELS) as InteractionType[]).map((t) => (
+              <option key={t} value={t}>
+                {TYPE_LABELS[t]}
+              </option>
+            ))}
+          </select>
+          {formik.touched.type && formik.errors.type && (
+            <div className="text-red-500 text-sm mt-1">{formik.errors.type as string}</div>
+          )}
+        </div>
 
-              <LogoUploader
-                label="Logo"
-                placeholder="Upload photo"
-                onSelect={(file) => {
-                  setFieldValue('avatarFile', file);
-                }}
-              />
+        <div>
+          <select
+            name="status"
+            value={formik.values.status}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className="border border-gray-300 rounded-lg px-3 py-2 w-full"
+          >
+            <option value="">Статус</option>
+            {(Object.keys(STATUS_LABELS) as InteractionStatus[]).map((s) => (
+              <option key={s} value={s}>
+                {STATUS_LABELS[s]}
+              </option>
+            ))}
+          </select>
+          {formik.touched.status && formik.errors.status && (
+            <div className="text-red-500 text-sm mt-1">{formik.errors.status as string}</div>
+          )}
+        </div>
 
-              <InputField
-                required
-                label="Status"
-                placeholder="Status"
-                name="status"
-                as="select"
-                error={touched.status && errors.status ? errors.status : undefined}
-              >
-                {Object.values(CompanyStatus).map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </InputField>
+        <div className="sm:col-span-2">
+          <DatePicker
+            selected={formik.values.nextCall}
+            onChange={(date) => formik.setFieldValue('nextCall', date)}
+            onBlur={formik.handleBlur}
+            showTimeSelect
+            timeFormat="HH:mm"
+            timeIntervals={15}
+            dateFormat="Pp"
+            placeholderText="Наступний звʼязок"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            name="nextCall"
+            minDate={minDate}
+            minTime={minTime}
+            maxTime={maxTime}
+          />
+          {formik.touched.nextCall && formik.errors.nextCall && (
+            <div className="text-red-500 text-sm mt-1">{formik.errors.nextCall as string}</div>
+          )}
+        </div>
+      </div>
 
-              <InputField
-                required
-                label="Country"
-                placeholder="Country"
-                name="countryId"
-                as="select"
-                error={touched.countryId && errors.countryId ? errors.countryId : undefined}
-              >
-                {countries?.map((country) => (
-                  <option key={country.id} value={country.id}>
-                    {country.name}
-                  </option>
-                ))}
-              </InputField>
-            </div>
-
-            <div className="flex flex-col flex-1 gap-5">
-              <InputField
-                required
-                label="Name"
-                placeholder="Name"
-                name="title"
-                error={touched.title && errors.title ? errors.title : undefined}
-              />
-
-              <InputField
-                required
-                label="Category"
-                placeholder="Category"
-                name="categoryId"
-                as="select"
-                error={touched.categoryId && errors.categoryId ? errors.categoryId : undefined}
-              >
-                {categories?.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.title}
-                  </option>
-                ))}
-              </InputField>
-
-              <InputField
-                required
-                label="Joined date"
-                type="date"
-                name="joinedDate"
-                error={touched.joinedDate && errors.joinedDate ? errors.joinedDate : undefined}
-              />
-
-              <InputField
-                required
-                label="Description"
-                placeholder="Description"
-                name="description"
-                error={touched.description && errors.description ? errors.description : undefined}
-              />
-            </div>
-          </div>
-
-          <Button type="submit" disabled={mutation.status === 'pending'}>
-            {mutation.status === 'pending' ? 'Adding company..' : 'Add company'}
-          </Button>
-        </Form>
+      <textarea
+        name="comment"
+        value={formik.values.comment}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        rows={3}
+        placeholder="Коментар менеджера..."
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4"
+      />
+      {formik.touched.comment && formik.errors.comment && (
+        <div className="text-red-500 text-sm mb-4">{formik.errors.comment as string}</div>
       )}
-    </Formik>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <input
+          type="number"
+          name="amount"
+          value={formik.values.amount ?? ''}
+          onChange={(e) =>
+            formik.setFieldValue('amount', e.target.value === '' ? null : Number(e.target.value))
+          }
+          onBlur={formik.handleBlur}
+          className="border border-gray-300 rounded-lg px-3 py-2"
+          placeholder="Сума ($)"
+          min={0}
+        />
+      </div>
+
+      <Button type="submit" disabled={mutation.status === 'pending'}>
+        {mutation.status === 'pending' ? 'Додаємо…' : 'Додати запис'}
+      </Button>
+    </form>
   );
 }

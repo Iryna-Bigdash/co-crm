@@ -50,7 +50,9 @@ export default function LogoUploader({
             src={preview}
             alt="preview"
             className={clsx(!square ? 'rounded-full' : 'rounded-md')}
-            style={{ width: 160, height: 160, objectFit: 'cover' }}
+            width={160}           
+            height={160}
+            style={{ objectFit: 'cover' }}
           />
         ) : (
           <>

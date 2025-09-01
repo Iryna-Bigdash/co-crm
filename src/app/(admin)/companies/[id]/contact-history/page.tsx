@@ -1,4 +1,4 @@
-import InteractionSection from '@/app/components/manager-work/interaction-card';
+import InteractionSection from '@/app/components/manager-work/interection-section';
 import React from 'react';
 
 export interface PageProps {
