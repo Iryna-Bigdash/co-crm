@@ -12,7 +12,7 @@ export default function Page({}: PageProps) {
 
   return (
     <Modal show={true} onClose={() => router.back()}>
-      <CompanyForm onSubmit={console.log} />
+      <CompanyForm onSubmit={() => router.back()} />
     </Modal>
   );
 }
