@@ -3,7 +3,7 @@
 import React from 'react';
 import {
   Phone, Send, Calendar, MessageSquare,
-  Clock, DollarSign, CheckCircle, AlertCircle, Trash2
+  Clock, CheckCircle, AlertCircle, Trash2
 } from 'lucide-react';
 import type { Interaction as ApiInteraction } from '@/lib/api';
 import DeleteConfirmation from '@/app/components/delete-comfirm-window';
@@ -83,7 +83,6 @@ export default function InteractionCard({ interaction, onDelete }: Props) {
 
         {interaction.amount != null && interaction.amount > 0 && (
           <div className="flex items-center gap-1 text-green-600 font-medium">
-            <DollarSign size={14} />
             <span>{interaction.amount.toLocaleString()} грн</span>
           </div>
         )}

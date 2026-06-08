@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteInteraction, getInteractionsForCompany } from '@/lib/api';
 import type { InteractionsListResponse } from '@/lib/api';
 import InteractionCard from './interaction-card';
-import InteractionForm from '../company-form';
+import InteractionForm from './interection-form';
 import { toast } from 'react-toastify';
 
 
