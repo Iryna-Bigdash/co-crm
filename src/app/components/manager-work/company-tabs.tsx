@@ -41,7 +41,7 @@ export default function CompanyTabs({ companyId }: CompanyTabsProps) {
   const pathname = usePathname();
 
   return (
-    <div className="flex items-center space-x-6 border-b pb-4">
+    <div className="flex items-center gap-3 sm:space-x-6 border-b pb-4 overflow-x-auto">
       {tabs.map(({ label, href, icon: Icon }) => {
         const url = href(companyId);
         const isActive = pathname === url;
@@ -51,7 +51,7 @@ export default function CompanyTabs({ companyId }: CompanyTabsProps) {
             key={label}
             href={url}
             className={clsx(
-              'flex items-center gap-2 px-4 py-2 rounded-lg transition',
+              'flex items-center gap-2 px-4 py-2 rounded-lg transition whitespace-nowrap shrink-0',
               isActive
                 ? 'bg-blue-100 text-blue-700 font-medium'
                 : 'text-gray-600 hover:text-blue-700'

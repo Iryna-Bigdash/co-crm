@@ -30,7 +30,7 @@ export default function SearchInput() {
   };
 
   return (
-    <div className="relative w-96">
+    <div className="relative w-full max-w-md">
       <input
         type="text"
         value={searchQuery}

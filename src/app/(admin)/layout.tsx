@@ -23,7 +23,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <>
       <Sidebar />
-      <div className="ml-60">{children}</div>
+      <div className="ml-0 lg:ml-60">{children}</div>
     </>
   );
 };

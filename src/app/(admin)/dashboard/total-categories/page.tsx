@@ -13,7 +13,7 @@ export default function Page({}: PageProps) {
   return (
     <>
       <Header>Dashboard/Total categories</Header>
-      <main className="py-10 pl-10 pr-7">
+      <main className="py-6 px-4 sm:py-10 sm:px-7 lg:pl-10 lg:pr-7">
         <CategoriesList />
       </main>
     </>

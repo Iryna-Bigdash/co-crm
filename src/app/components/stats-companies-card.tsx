@@ -38,7 +38,7 @@ export default function StatsCompaniesCard() {
   if (isError) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="grid grid-cols-12 gap-5">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
       {(Object.keys(labelByStat) as (keyof SummaryStats)[]).map((key) => {
         const route = routeByStat[key];
         const isClickable = Boolean(route);
@@ -50,7 +50,7 @@ export default function StatsCompaniesCard() {
         return (
           <div
             key={key}
-            className="col-span-3"
+            className="h-full"
             role={isClickable ? 'button' : undefined}
             tabIndex={isClickable ? 0 : undefined}
             onClick={isClickable ? openRoute : undefined}
@@ -68,8 +68,8 @@ export default function StatsCompaniesCard() {
             <div
               className={
                 isClickable
-                  ? 'cursor-pointer transition-transform hover:scale-[1.02]'
-                  : undefined
+                  ? 'h-full cursor-pointer transition-transform hover:scale-[1.02]'
+                  : 'h-full'
               }
             >
               <StatCard

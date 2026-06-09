@@ -25,9 +25,9 @@ export default function CategoriesCompaniesCard() {
   if (isError) return <div>Error: {error.message}</div>;
 
   return (
-      <div className="grid grid-cols-12 gap-3 pb-5 px-5" style={{ maxHeight: '230px', overflowY: 'scroll' }}>
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 pb-5 px-5" style={{ maxHeight: '230px', overflowY: 'scroll' }}>
         {categories.map(({ id, title }) => (
-          <div key={id} className="col-span-3">
+          <div key={id}>
             <StatCard
               type={StatCardType.Dark}
               label={title}

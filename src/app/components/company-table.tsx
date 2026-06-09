@@ -33,8 +33,8 @@ export default function CompanyTable() {
   );
 
   return (
-    <div className="py-8 px-10 bg-gray-100">
-      <table className="table-auto w-full border-separate border-spacing-y-2">
+    <div className="py-6 px-4 sm:py-8 sm:px-10 bg-gray-100 overflow-x-auto">
+      <table className="table-auto w-full min-w-[640px] border-separate border-spacing-y-2">
         <thead>
           <tr>
             {headers.map((header, i) => (
