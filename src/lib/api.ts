@@ -106,7 +106,7 @@ const newLocal = (...paths: string[]) => {
 
   const baseUrl = isDevelopment
     ? 'http://localhost:3000/api' // Локальна база даних для режиму розробки
-    : 'https://co-crm-api-production.up.railway.app/api'; // Віддалена база даних для продакшену
+    : 'https://api-yho4.onrender.com/api'; // Віддалена база даних для продакшену
 
   return `${baseUrl}/${paths.join('/')}`;
 };
@@ -115,7 +115,7 @@ const newLocal = (...paths: string[]) => {
 //   `http://localhost:3000/api/${paths.join('/')}`;
 
 // const buildUrl = (...paths: string[]) =>
-//   `https://co-crm-api-production.up.railway.app/api/${paths.join('/')}`;
+//   `https://api-yho4.onrender.com/api/${paths.join('/')}`;
 
 const buildUrl = newLocal;
 
