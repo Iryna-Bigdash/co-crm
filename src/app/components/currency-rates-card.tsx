@@ -3,11 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-interface ExchangeRate {
-  currency: string;
-  rate: number;
-}
-
 interface CurrencyRates {
   uahToUsd: number;
   uahToEur: number;
@@ -25,28 +20,13 @@ export default function CurrencyRatesCard() {
   const { data: rates, isLoading } = useQuery<CurrencyRates>({
     queryKey: ['currency-rates'],
     queryFn: async () => {
-      try {
-        const response = await fetch('https://api.privatbank.ua/p24api/pubinfo?exchange&coursid=5');
-        const data = await response.json();
-        
-        const usd = data.find((rate: any) => rate.ccy === 'USD');
-        const eur = data.find((rate: any) => rate.ccy === 'EUR');
-        
-        return {
-          uahToUsd: parseFloat(usd?.buy || '0'),
-          uahToEur: parseFloat(eur?.buy || '0'),
-          usdToEur: eur && usd ? parseFloat(eur.buy) / parseFloat(usd.buy) : 0,
-          lastUpdate: new Date().toLocaleString('uk-UA'),
-        };
-      } catch (error) {
-        console.error('Error fetching rates:', error);
-        return {
-          uahToUsd: 41.5,
-          uahToEur: 45.0,
-          usdToEur: 1.08,
-          lastUpdate: new Date().toLocaleString('uk-UA'),
-        };
+      const response = await fetch('/api/currency-rates');
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch currency rates');
       }
+
+      return response.json();
     },
     staleTime: 5 * 60 * 1000, // Update every 5 minutes
     refetchInterval: 5 * 60 * 1000,
