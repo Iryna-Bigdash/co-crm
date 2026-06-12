@@ -78,9 +78,9 @@ export default function Modal({ show, children, onClose, title }: ModalProps) {
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative w-full max-w-2xl transform overflow-hidden rounded-xl bg-white p-6 text-left shadow-xl transition-all">
+              <Dialog.Panel className="relative w-full max-w-2xl transform overflow-hidden rounded-xl bg-white dark:bg-gray-800 p-6 text-left shadow-xl transition-all">
                 {title && (
-                  <Dialog.Title className="text-2xl font-bold text-center">
+                  <Dialog.Title className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
                     {title}
                   </Dialog.Title>
                 )}

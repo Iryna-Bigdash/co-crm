@@ -30,14 +30,14 @@ export const ContractCard: React.FC<ContractCardProps> = ({
     date ? date.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
 
   return (
-    <li className="border p-4 rounded-lg hover:bg-gray-50 transition flex items-center justify-between">
+    <li className="border border-gray-200 dark:border-gray-700 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center justify-between bg-white dark:bg-gray-800">
     {/* Лівий блок з текстом */}
     <div>
-      <p className="font-medium text-gray-800">Послуга: {contract.service}</p>
-      <p className="text-sm text-gray-600">Термін: {contract.term}</p>
-      <p className="text-sm text-gray-600">Залогова сума: {contract.deposit} грн</p>
-      <p className="text-sm text-gray-600">Термін взаємодії: {contract.interactionPeriod}</p>
-      <p className="text-xs text-gray-500 mt-2">
+      <p className="font-medium text-gray-800 dark:text-gray-100">Послуга: {contract.service}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-300">Термін: {contract.term}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-300">Залогова сума: {contract.deposit} грн</p>
+      <p className="text-sm text-gray-600 dark:text-gray-300">Термін взаємодії: {contract.interactionPeriod}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
         Створено: {formatDate(contract.createdAt)} | Оновлено: {formatDate(contract.updatedAt)}
       </p>
     </div>
@@ -45,13 +45,13 @@ export const ContractCard: React.FC<ContractCardProps> = ({
     {/* Правий блок з іконками */}
     <div className="flex items-end gap-2 ml-4">
       <button onClick={() => onEdit(contract)} title="Редагувати">
-        <PencilLine className="w-6 h-6 text-blue-600 hover:text-blue-800" />
+        <PencilLine className="w-6 h-6 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" />
       </button>
       <button onClick={() => onPreview(contract)} title="Перегляд PDF">
-        <EyeIcon className="w-6 h-6 text-blue-600 hover:text-blue-800" />
+        <EyeIcon className="w-6 h-6 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" />
       </button>
       <button onClick={() => onPrint(contract)} title="Друк">
-        <PrinterIcon className="w-6 h-6 text-blue-600 hover:text-blue-800" />
+        <PrinterIcon className="w-6 h-6 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" />
       </button>
     </div>
   </li>

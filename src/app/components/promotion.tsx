@@ -50,8 +50,8 @@ export default function Promotion({ promotion }: PromotionProps) {
   };
 
   return (
-    <div className="rounded overflow-hidden bg-gray-100 flex flex-col">
-      <div className="relative w-full h-40 bg-gray-300">
+    <div className="rounded overflow-hidden bg-gray-100 dark:bg-gray-800 flex flex-col border border-gray-200 dark:border-gray-700">
+      <div className="relative w-full h-40 bg-gray-300 dark:bg-gray-700">
         {promotion.avatar && (
           <Image fill src={promotion.avatar} alt="promotion avatar" />
         )}
@@ -62,11 +62,11 @@ export default function Promotion({ promotion }: PromotionProps) {
       </div>
 
       <div className="flex flex-col p-5 gap-3 flex-grow">
-        <p className="text-base font-semibold text-gray-900">
+        <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
           {promotion.title}
         </p>
 
-        <p className="text-sm text-gray-900 break-words overflow-hidden">
+        <p className="text-sm text-gray-900 dark:text-gray-300 break-words overflow-hidden">
           {promotion.description}
         </p>
 
@@ -82,7 +82,7 @@ export default function Promotion({ promotion }: PromotionProps) {
               viewBox="0 0 24 24"
               strokeWidth="1.5"
               stroke="currentColor"
-              className="size-5 hover:stroke-cyan-700"
+              className="size-5 hover:stroke-cyan-700 dark:hover:stroke-cyan-400"
             >
               <path
                 strokeLinecap="round"
@@ -92,14 +92,14 @@ export default function Promotion({ promotion }: PromotionProps) {
             </svg>
           </DeleteConfirmation>
 
-          <button className="text-sm text-gray-900" onClick={handleOpenEditModal}>
+          <button className="text-sm text-gray-900 dark:text-gray-100" onClick={handleOpenEditModal}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth="1.5"
               stroke="currentColor"
-              className="size-5 hover:stroke-cyan-700"
+              className="size-5 hover:stroke-cyan-700 dark:hover:stroke-cyan-400"
             >
               <path
                 strokeLinecap="round"

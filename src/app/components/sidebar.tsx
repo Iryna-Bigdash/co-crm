@@ -5,13 +5,14 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import SidebarItem from './sidebar-item';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 export interface SidebarProps {}
 
 export default function Sidebar({}: SidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { data: session } = useSession();
 
   // Close the mobile drawer whenever the route changes.
   useEffect(() => {
@@ -108,6 +109,26 @@ export default function Sidebar({}: SidebarProps) {
             >
               Companies
             </SidebarItem>
+            {session?.user?.role === 'admin' && (
+              <>
+                <SidebarItem
+                  current={pathname === '/managers'}
+                  pathname="/managers"
+                  src="/icons/briefcase.svg"
+                  alt="managers icon"
+                >
+                  Managers
+                </SidebarItem>
+                <SidebarItem
+                  current={pathname === '/manager-assignments'}
+                  pathname="/manager-assignments"
+                  src="/icons/briefcase.svg"
+                  alt="assignments icon"
+                >
+                  Manager Assignments
+                </SidebarItem>
+              </>
+            )}
           </ul>
           <button
             className="flex items-center gap-2 p-6 mt-auto mx-auto"

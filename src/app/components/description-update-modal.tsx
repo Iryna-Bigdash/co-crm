@@ -46,7 +46,7 @@ export default function UpdateDescriptionModal({
 
   return (
     <Modal show={show} onClose={onClose} title="Update Company Description">
-      <div className="max-w-xl w-full bg-white p-6 rounded-2xl shadow-md border border-gray-200 mt-3">
+      <div className="max-w-xl w-full bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 mt-3">
         <Formik
           initialValues={{ description: initialDescription }}
           validationSchema={validationSchema}
@@ -64,7 +64,7 @@ export default function UpdateDescriptionModal({
               <div>
                 <label
                   htmlFor="description"
-                  className="block text-m font-medium text-gray-700 mb-2"
+                  className="block text-m font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Enter New Description for {title}
                 </label>
@@ -74,7 +74,7 @@ export default function UpdateDescriptionModal({
                   name="description"
                   rows={5}
                   placeholder="Enter updated company description"
-                  className="w-full px-4 py-3 text-sm text-gray-800 border border-gray-300 rounded-xl shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+                  className="w-full px-4 py-3 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-blue-400 dark:focus:border-blue-500 transition placeholder:text-gray-500 dark:placeholder:text-gray-400"
                 />
                 <ErrorMessage
                   name="description"
@@ -83,11 +83,11 @@ export default function UpdateDescriptionModal({
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-4">
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-5 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition"
+                  className="px-5 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition"
                 >
                   Cancel
                 </button>

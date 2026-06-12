@@ -36,7 +36,7 @@ export default function CompanyRow({ company }: CompanyRowProps) {
     : '/images/company-avatar.png';
 
   return (
-    <tr className="h-14 text-center text-gray-900 bg-white">
+    <tr className="h-14 text-center text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 transition-colors">
       <td
         className={clsx(
           'text-xs font-medium rounded-l border-l-4',
@@ -68,7 +68,7 @@ export default function CompanyRow({ company }: CompanyRowProps) {
               />
             )}
           </div>
-          <Link href={`/companies/${company.id}`} className="text-gray-900">
+          <Link href={`/companies/${company.id}`} className="text-gray-900 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
             {company.title}
           </Link>
         </div>
@@ -85,7 +85,7 @@ export default function CompanyRow({ company }: CompanyRowProps) {
             alt="promotion icon"
           />
           <span
-            className={`text-sm font-medium ${company.hasPromotions ? 'text-green-700' : 'text-red-700'}`}
+            className={`text-sm font-medium ${company.hasPromotions ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
           >
             {company.hasPromotions ? 'Yes' : 'No'}
           </span>

@@ -41,13 +41,13 @@ export function DocumentsList({ companyId }: DocumentsListProps) {
   });
 
   if (isLoading)
-    return <p className="text-sm text-gray-500">Завантаження документів...</p>;
+    return <p className="text-sm text-gray-500 dark:text-gray-400">Завантаження документів...</p>;
 
   if (isError)
-    return <p className="text-sm text-red-500">Не вдалося отримати документи</p>;
+    return <p className="text-sm text-red-500 dark:text-red-400">Не вдалося отримати документи</p>;
 
   if (!documents || documents.length === 0)
-    return <p className="text-sm text-gray-400">Документи відсутні</p>;
+    return <p className="text-sm text-gray-400 dark:text-gray-500">Документи відсутні</p>;
 
   return (
     <>
@@ -55,13 +55,13 @@ export function DocumentsList({ companyId }: DocumentsListProps) {
         {documents.map((doc) => (
           <li
             key={doc.filename}
-            className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg border"
+            className="flex items-center justify-between bg-gray-50 dark:bg-gray-700 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600"
           >
             <a
               href={doc.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline break-all"
+              className="text-blue-600 dark:text-blue-400 hover:underline break-all"
             >
               {doc.filename}
             </a>

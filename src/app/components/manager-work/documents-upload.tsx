@@ -72,7 +72,7 @@ export function DocumentUploadForm({
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="file" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="file" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Оберіть документ (PDF, JPG, PNG, WEBP)
         </label>
         <input
@@ -87,7 +87,7 @@ export function DocumentUploadForm({
           }}
           disabled={uploading}
           ref={fileInputRef}
-          className="mt-1 block w-full border px-2 py-1 rounded"
+          className="mt-1 block w-full border px-2 py-1 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
         />
         {formik.touched.file && formik.errors.file && (
           <div className="text-red-500 text-sm mt-1">{formik.errors.file}</div>
@@ -95,7 +95,7 @@ export function DocumentUploadForm({
       </div>
 
       <div>
-        <label htmlFor="documentName" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="documentName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Назва документа (необов’язково)
         </label>
         <input
@@ -105,7 +105,7 @@ export function DocumentUploadForm({
           placeholder="Наприклад: Passport"
           onChange={formik.handleChange}
           value={formik.values.documentName}
-          className="mt-1 block w-full border px-2 py-1 rounded"
+          className="mt-1 block w-full border px-2 py-1 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 placeholder:text-gray-500 dark:placeholder:text-gray-400"
         />
         {formik.touched.documentName && formik.errors.documentName && (
           <div className="text-red-500 text-sm mt-1">{formik.errors.documentName}</div>

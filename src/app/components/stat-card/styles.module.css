@@ -17,3 +17,20 @@
 .gradient:nth-child(4n + 4) {
   background-image: url('/images/mesh-gradient-4.svg');
 }
+
+/* Dark mode gradients */
+:global(.dark) .gradient:nth-child(4n + 1) {
+  background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+:global(.dark) .gradient:nth-child(4n + 2) {
+  background-image: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+:global(.dark) .gradient:nth-child(4n + 3) {
+  background-image: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+:global(.dark) .gradient:nth-child(4n + 4) {
+  background-image: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}

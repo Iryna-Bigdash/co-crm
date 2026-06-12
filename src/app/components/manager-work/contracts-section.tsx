@@ -125,13 +125,13 @@ export function ContractsSection({ companyId }: ContractsProps) {
         }}
       />
 
-      <div className="border border-gray-200 rounded-xl p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
-          Контракти компанії <span className="text-blue-700">#{companyId}</span>
+      <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-6 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+          Контракти компанії <span className="text-blue-700 dark:text-blue-400">#{companyId}</span>
         </h2>
 
         {contracts.length === 0 ? (
-          <p className="text-sm text-gray-600">Контракти ще не додано.</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Контракти ще не додано.</p>
         ) : (
           <ul className="space-y-4">
             {contracts.map(contract => (

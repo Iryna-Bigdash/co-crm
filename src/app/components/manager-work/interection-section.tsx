@@ -46,15 +46,15 @@ export default function InteractionSection({ companyId }: { companyId: string })
     [data]
   );
 
-  if (isLoading) return <div>Завантаження взаємодій…</div>;
-  if (isError)   return <div>Не вдалося отримати взаємодії.</div>;
+  if (isLoading) return <div className="text-gray-700 dark:text-gray-300">Завантаження взаємодій…</div>;
+  if (isError)   return <div className="text-gray-700 dark:text-gray-300">Не вдалося отримати взаємодії.</div>;
 
   return (
     <div className="space-y-6">
       <InteractionForm companyId={companyId} />
 
       {items.length === 0 ? (
-        <div className="text-sm text-gray-500">Поки що немає взаємодій.</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">Поки що немає взаємодій.</div>
       ) : (
         items.map(item => <InteractionCard
            key={item.id}

@@ -58,26 +58,26 @@ export function AddContractModal({ onAdd }: AddContractModalProps) {
             {() => (
               <Form className="space-y-4 mt-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Послуга</label>
-                  <Field name="service" className="w-full border rounded-md p-2" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Послуга</label>
+                  <Field name="service" className="w-full border rounded-md p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600" />
                   <ErrorMessage name="service" component="div" className="text-red-500 text-sm" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Термін</label>
-                  <Field name="term" className="w-full border rounded-md p-2" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Термін</label>
+                  <Field name="term" className="w-full border rounded-md p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600" />
                   <ErrorMessage name="term" component="div" className="text-red-500 text-sm" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Залогова сума</label>
-                  <Field name="deposit" type="number" className="w-full border rounded-md p-2" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Залогова сума</label>
+                  <Field name="deposit" type="number" className="w-full border rounded-md p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600" />
                   <ErrorMessage name="deposit" component="div" className="text-red-500 text-sm" />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Термін взаємодії</label>
-                  <Field name="interactionPeriod" className="w-full border rounded-md p-2" />
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Термін взаємодії</label>
+                  <Field name="interactionPeriod" className="w-full border rounded-md p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600" />
                   <ErrorMessage name="interactionPeriod" component="div" className="text-red-500 text-sm" />
                 </div>
 

@@ -31,9 +31,9 @@ export default function InteractionCard({ interaction, onDelete }: Props) {
   const sMeta = STATUS_META[interaction.status];
 
   return (
-    <div className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm">
+    <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-white dark:bg-gray-800 shadow-sm">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2 text-sm text-gray-700">
+        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
           {tIcon}
           <span className="font-medium">
             {new Date(interaction.date).toLocaleDateString('uk-UA')}
@@ -53,19 +53,19 @@ export default function InteractionCard({ interaction, onDelete }: Props) {
               text="Видалити цей запис взаємодії?"
               onDelete={onDelete} 
             >
-              <button title="Видалити" className="p-1 rounded hover:bg-gray-100">
-                <Trash2 className="w-4 h-4" />
+              <button title="Видалити" className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+                <Trash2 className="w-4 h-4 text-gray-700 dark:text-gray-300" />
               </button>
             </DeleteConfirmation>
           )}
         </div>
       </div>
 
-      <p className="text-sm text-gray-800 mb-3">{interaction.comment}</p>
+      <p className="text-sm text-gray-800 dark:text-gray-200 mb-3">{interaction.comment}</p>
 
       <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-2">
         {interaction.nextCall && (
-          <div className="flex items-center gap-1 text-blue-600">
+          <div className="flex items-center gap-1 text-blue-600 dark:text-blue-400">
             <Clock size={14} />
             <span>
               Наступний звʼязок:{' '}
@@ -82,7 +82,7 @@ export default function InteractionCard({ interaction, onDelete }: Props) {
         )}
 
         {interaction.amount != null && interaction.amount > 0 && (
-          <div className="flex items-center gap-1 text-green-600 font-medium">
+          <div className="flex items-center gap-1 text-green-600 dark:text-green-400 font-medium">
             <span>{interaction.amount.toLocaleString()} грн</span>
           </div>
         )}

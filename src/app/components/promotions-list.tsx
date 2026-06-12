@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
 import SummaryTable from './summary-table';
 import SummaryTableCell from './summary-table-cell';
 import SummaryTableHeader from './summary-table-header';
@@ -12,30 +13,33 @@ export interface PromotionsListProps {
 }
 
 export default function PromotionsList({ enabled = true }: PromotionsListProps) {
+  const { data: session } = useSession();
+  const employeeId = session?.user?.role === 'manager' ? session.user.id : undefined;
+
   const {
     data: promotions = [],
     isLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: ['promotions'],
-    queryFn: () => getPromotions(),
+    queryKey: ['promotions', employeeId],
+    queryFn: () => getPromotions(employeeId ? { employeeId } : {}),
     staleTime: 10 * 1000,
     enabled,
   });
 
-  if (isLoading) return <div className="py-6 text-center">Loading...</div>;
+  if (isLoading) return <div className="py-6 text-center text-gray-900 dark:text-gray-100">Loading...</div>;
 
   if (isError)
     return (
-      <div className="py-6 text-center text-red-600">
+      <div className="py-6 text-center text-red-600 dark:text-red-400">
         Error: {error.message}
       </div>
     );
 
   if (promotions.length === 0)
     return (
-      <div className="py-6 text-center text-gray-500">No promotions found</div>
+      <div className="py-6 text-center text-gray-500 dark:text-gray-400">No promotions found</div>
     );
 
   return (

@@ -36,7 +36,7 @@ export default function CompanyInfo({ companyId }: CompanyInfoProps) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex flex-col items-center p-7 gap-5 bg-gray-900 rounded">
+      <div className="flex flex-col items-center p-7 gap-5 bg-gray-100 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700">
         <div className="w-20 h-20 rounded-full bg-blue-500 relative">
           <Image
             src={avatarUrl}
@@ -47,24 +47,24 @@ export default function CompanyInfo({ companyId }: CompanyInfoProps) {
             className="rounded-full"
           />
         </div>
-        <p className="pb text-base font-semibold text-white">{company.title}</p>
+        <p className="pb text-base font-semibold text-gray-900 dark:text-white">{company.title}</p>
         <StatusLabel status={company.status} />
       </div>
 
-      <div className="p-7 text-base text-gray-900 bg-gray-100 rounded">
-        <p className="pb-5 text-xl font-semibold">About company</p>
-        <p className="pb-3">{`Category: ${company.categoryTitle}`}</p>
-        <p className="pb-3">{`Country: ${company.countryTitle}`}</p>
-        <p className="pb-3">{`Joined date: ${new Date(company.joinedDate).toLocaleDateString('uk')}`}</p>
-        <div className="w-full h-px my-8 bg-gray-300" />
+      <div className="p-7 text-base text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+        <p className="pb-5 text-xl font-semibold text-gray-900 dark:text-gray-100">About company</p>
+        <p className="pb-3 text-gray-800 dark:text-gray-300">{`Category: ${company.categoryTitle}`}</p>
+        <p className="pb-3 text-gray-800 dark:text-gray-300">{`Country: ${company.countryTitle}`}</p>
+        <p className="pb-3 text-gray-800 dark:text-gray-300">{`Joined date: ${new Date(company.joinedDate).toLocaleDateString('uk')}`}</p>
+        <div className="w-full h-px my-8 bg-gray-300 dark:bg-gray-600" />
 
         <div className="flex justify-between items-start">
-          <p className="text-gray-700 text-sm leading-relaxed max-w-[90%]">
+          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed max-w-[90%]">
             {company.description || 'No description provided.'}
           </p>
 
           <button
-            className="text-sm text-gray-900 p-1 rounded hover:bg-gray-100"
+            className="text-sm text-gray-900 dark:text-gray-300 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
             aria-label="Edit description"
             onClick={handleOpenEditModal}
           >
@@ -74,7 +74,7 @@ export default function CompanyInfo({ companyId }: CompanyInfoProps) {
               viewBox="0 0 24 24"
               strokeWidth="1.5"
               stroke="currentColor"
-              className="w-5 h-5 hover:stroke-cyan-700"
+              className="w-5 h-5 hover:stroke-cyan-700 dark:hover:stroke-cyan-400"
             >
               <path
                 strokeLinecap="round"

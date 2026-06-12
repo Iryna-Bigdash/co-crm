@@ -2,6 +2,7 @@ import React from 'react';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import AuthProviders from './components/auth-providers';
+import { ThemeProvider } from '@/contexts/theme-context';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -39,7 +40,7 @@ export default function RootLayout({
         <meta property="og:type" content="website" />
 
         {/* Favicon */}
-        <link rel="icon" href="icons/favicon.svg" sizes="any" />
+<link rel="icon" href="/icons/favicon.svg" sizes="any" />
 
         {/* Schema.org JSON-LD */}
         <script
@@ -64,21 +65,23 @@ export default function RootLayout({
         />
       </head>
       <body className={font.className}>
-        <AuthProviders>
-          {children}
-        </AuthProviders>
-        <ToastContainer 
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          toastClassName="toast"
-        />
+        <ThemeProvider>
+          <AuthProviders>
+            {children}
+          </AuthProviders>
+          <ToastContainer 
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            toastClassName="toast"
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

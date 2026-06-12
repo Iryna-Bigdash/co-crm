@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
 import { getSummaryStats, SummaryStats } from '@/lib/api';
 import StatCard, { StatCardType } from './stat-card';
 
@@ -22,6 +23,8 @@ const routeByStat: Partial<Record<keyof SummaryStats, string>> = {
 
 export default function StatsCompaniesCard() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const employeeId = session?.user?.role === 'manager' ? session.user.id : undefined;
 
   const { 
     data: summaryStats,
@@ -29,8 +32,8 @@ export default function StatsCompaniesCard() {
     isError,
     error, 
   } = useQuery({
-    queryKey: ['summary-stats'],
-    queryFn: getSummaryStats,
+    queryKey: ['summary-stats', employeeId],
+    queryFn: () => getSummaryStats(employeeId),
     staleTime: 10 * 1000,
   });
 

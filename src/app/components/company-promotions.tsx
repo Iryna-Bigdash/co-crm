@@ -22,7 +22,7 @@ export default function CompanyPromotions({
 
   if (!data || data.length === 0) {
     return (
-      <div className="col-span-12 text-center text-gray-500 py-10">
+      <div className="col-span-12 text-center text-gray-500 dark:text-gray-400 py-10">
        This company currently has no active promotions.
       </div>
     );

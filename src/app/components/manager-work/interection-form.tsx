@@ -75,7 +75,7 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
   const maxTime = new Date(new Date().setHours(23, 45, 0, 0));
 
   return (
-    <form onSubmit={formik.handleSubmit} className="mb-8 p-4 border rounded-xl bg-white shadow-sm">
+    <form onSubmit={formik.handleSubmit} className="mb-8 p-4 border rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 shadow-sm">
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
         <div>
           <select
@@ -83,7 +83,7 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
             value={formik.values.type}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className="border rounded-lg px-3 py-2 w-full"
+            className="border rounded-lg px-3 py-2 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
           >
             <option value="">Тип звʼязку</option>
             <option value="call">Дзвінок</option>
@@ -102,7 +102,7 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
             value={formik.values.status}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            className="border rounded-lg px-3 py-2 w-full"
+            className="border rounded-lg px-3 py-2 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
           >
             <option value="">Статус</option>
             <option value="pending">В процесі</option>
@@ -125,7 +125,7 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
             timeIntervals={15}
             dateFormat="Pp"
             placeholderText="Наступний звʼязок"
-            className="w-full border rounded-lg px-3 py-2"
+            className="w-full border rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
             name="nextCall"
             minDate={minDate}
             minTime={minTime}
@@ -144,7 +144,7 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
         onBlur={formik.handleBlur}
         rows={3}
         placeholder="Коментар менеджера..."
-        className="w-full border rounded-lg px-3 py-2 mb-4"
+        className="w-full border rounded-lg px-3 py-2 mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 placeholder:text-gray-500 dark:placeholder:text-gray-400"
       />
       {formik.touched.comment && formik.errors.comment && (
         <div className="text-red-500 text-sm mb-4">{formik.errors.comment as string}</div>
@@ -158,7 +158,7 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
           formik.setFieldValue('amount', e.target.value === '' ? null : Number(e.target.value))
         }
         onBlur={formik.handleBlur}
-        className="border rounded-lg px-3 py-2 mb-4"
+        className="border rounded-lg px-3 py-2 mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 placeholder:text-gray-500 dark:placeholder:text-gray-400"
         placeholder="Сума (грн)"
         min={0}
       />
@@ -166,7 +166,7 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
       <button
         type="submit"
         disabled={mutation.status === 'pending'}
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
       >
         {mutation.status === 'pending' ? 'Додаємо…' : 'Додати запис'}
       </button>

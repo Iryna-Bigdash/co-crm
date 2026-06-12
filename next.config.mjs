@@ -20,6 +20,12 @@ const nextConfig = {
         port: '3000',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api-yho4.onrender.com',
+        port: '',
+        pathname: '/uploads/**',
+      },
     ],
   },
 

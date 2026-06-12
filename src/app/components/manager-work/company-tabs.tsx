@@ -41,7 +41,7 @@ export default function CompanyTabs({ companyId }: CompanyTabsProps) {
   const pathname = usePathname();
 
   return (
-    <div className="flex items-center gap-3 sm:space-x-6 border-b pb-4 overflow-x-auto">
+    <div className="flex items-center gap-3 sm:space-x-6 border-b dark:border-gray-700 pb-4 overflow-x-auto">
       {tabs.map(({ label, href, icon: Icon }) => {
         const url = href(companyId);
         const isActive = pathname === url;
@@ -53,13 +53,13 @@ export default function CompanyTabs({ companyId }: CompanyTabsProps) {
             className={clsx(
               'flex items-center gap-2 px-4 py-2 rounded-lg transition whitespace-nowrap shrink-0',
               isActive
-                ? 'bg-blue-100 text-blue-700 font-medium'
-                : 'text-gray-600 hover:text-blue-700'
+                ? 'bg-blue-100 text-blue-700 font-medium dark:bg-blue-900 dark:text-blue-300'
+                : 'text-gray-600 hover:text-blue-700 dark:text-gray-300 dark:hover:text-blue-400'
             )}
           >
             <Icon
               size={18}
-              className={clsx(isActive ? 'text-blue-700' : 'text-gray-500')}
+              className={clsx(isActive ? 'text-blue-700 dark:text-blue-300' : 'text-gray-500 dark:text-gray-400')}
             />
             <span>{label}</span>
           </Link>

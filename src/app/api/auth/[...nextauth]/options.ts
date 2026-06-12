@@ -85,6 +85,9 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { GithubProfile } from 'next-auth/providers/github';
 
 export const options: NextAuthOptions = {
+  pages: {
+    signIn: '/signin',
+  },
   theme: {
     colorScheme: 'dark',
     brandColor: '#E9D5FF', // Hex color code
@@ -97,7 +100,7 @@ export const options: NextAuthOptions = {
         console.log('GitHub Profile:', profile);
         return {
           ...profile,
-          role: profile.role ?? 'user',
+          role: 'admin',
           id: profile.id.toString(),
           image: profile.avatar_url,
           email: profile.email,
@@ -121,22 +124,38 @@ export const options: NextAuthOptions = {
         },
       },
       async authorize(credentials) {
-        console.log('Credentials Authorize Callback:', credentials); 
-        const user = {
-          id: '28',
-          name: 'Iryna',
-          password: '123456Ira',
-          role: 'admin',
-        };
+        console.log('Credentials Authorize Callback:', credentials);
+        
+        try {
+          const apiUrl = process.env.NODE_ENV === 'production'
+            ? 'https://api-yho4.onrender.com/api'
+            : 'http://localhost:3000/api';
+          
+          const response = await fetch(`${apiUrl}/employees/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              email: credentials?.username, 
+              password: credentials?.password 
+            }),
+          });
 
-        if (
-          credentials?.username === user.name &&
-          credentials?.password === user.password
-        ) {
-          console.log('Authorization successful:', user);
-          return user;
-        } else {
-          console.log('Authorization failed');
+          if (!response.ok) {
+            console.log('Authorization failed');
+            return null;
+          }
+
+          const employee = await response.json();
+          console.log('Authorization successful:', employee);
+          
+          return {
+            id: employee.id,
+            name: employee.name,
+            email: employee.email,
+            role: employee.role.toLowerCase(),
+          };
+        } catch (error) {
+          console.error('Authorization error:', error);
           return null;
         }
       },
@@ -145,12 +164,18 @@ export const options: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       console.log('JWT Callback - Token:', token, 'User:', user);
-      if (user) token.role = user.role;
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
       return token;
     },
     async session({ session, token }) {
       console.log('Session Callback - Session:', session, 'Token:', token);
-      if (session?.user) session.user.role = token.role;
+      if (session?.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+      }
       return session;
     },
   },

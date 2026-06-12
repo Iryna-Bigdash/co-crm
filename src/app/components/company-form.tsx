@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Form, Formik } from 'formik';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
 import * as Yup from 'yup';
 import {
   CompanyStatus,
@@ -53,7 +54,10 @@ export interface CompanyFormProps {
 export default function CompanyForm({ onSubmit }: CompanyFormProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const { data: session } = useSession();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+  const employeeId = session?.user?.role === 'manager' ? session.user.id : undefined;
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -68,7 +72,7 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
   });
 
   const mutation = useMutation({
-    mutationFn: createCompany,
+    mutationFn: (data: Omit<any, 'id' | 'hasPromotions'>) => createCompany(data, employeeId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
       queryClient.invalidateQueries({ queryKey: ['categories'] });
@@ -81,6 +85,7 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
       queryClient.invalidateQueries({ queryKey: ['promotions'] });
       queryClient.invalidateQueries({ queryKey: ['summary-stats'] });
       queryClient.invalidateQueries({ queryKey: ['summary-sales'] });
+      queryClient.invalidateQueries({ queryKey: ['assignments'] });
       toast.success('Company successfully added!', {
         position: 'top-right',
         autoClose: 3000,

@@ -13,11 +13,11 @@ export default function SummaryTableHeader({
   return (
     <th
       className={clsx(
-        'py-2 px-5 text-xs font-normal first-of-type:rounded-l-sm last-of-type:rounded-r-sm',
+        'py-2 px-5 text-xs font-normal first-of-type:rounded-l-sm last-of-type:rounded-r-sm transition-colors',
         `text-${align}`,
-        '[&:nth-child(3n+1)]:text-white [&:nth-child(3n+1)]:bg-gray-900',
-        '[&:nth-child(3n+2)]:text-gray-900 [&:nth-child(3n+2)]:bg-purple-200',
-        '[&:nth-child(3n+3)]:text-gray-900 [&:nth-child(3n+3)]:bg-lime-200',
+        '[&:nth-child(3n+1)]:text-white [&:nth-child(3n+1)]:bg-gray-900 dark:[&:nth-child(3n+1)]:bg-gray-700',
+        '[&:nth-child(3n+2)]:text-gray-900 dark:[&:nth-child(3n+2)]:text-gray-100 [&:nth-child(3n+2)]:bg-purple-200 dark:[&:nth-child(3n+2)]:bg-purple-900',
+        '[&:nth-child(3n+3)]:text-gray-900 dark:[&:nth-child(3n+3)]:text-gray-100 [&:nth-child(3n+3)]:bg-lime-200 dark:[&:nth-child(3n+3)]:bg-lime-900',
       )}
     >
       {children}

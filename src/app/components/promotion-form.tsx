@@ -104,7 +104,7 @@ export default function PromotionForm({
     >
       {({ errors, touched }) => (
         <Form className="flex flex-col gap-10">
-          <p className="mb-0.5 text-xl">Add New Promotion</p>
+          <p className="mb-0.5 text-xl text-gray-900 dark:text-gray-100">Add New Promotion</p>
           <div className="flex flex-col gap-5">
             <InputField
               required

@@ -145,33 +145,36 @@ const sendRequestWithLimit = async <T>(
   return res.json() as Promise<T>;
 };
 
-export const getSummaryStats = (init?: RequestInit) => {
-  return sendRequestWithLimit<SummaryStats>(
-    buildUrl('summary-stats'),
-    init,
-  );
+export const getSummaryStats = (employeeId?: string, init?: RequestInit) => {
+  const url = employeeId
+    ? `${buildUrl('summary-stats')}?employeeId=${employeeId}`
+    : buildUrl('summary-stats');
+  return sendRequestWithLimit<SummaryStats>(url, init);
 };
 
-export const getSummarySales = (init?: RequestInit) => {
-  return sendRequestWithLimit<SummarySales[]>(buildUrl('summary-sales'), init);
+export const getSummarySales = (employeeId?: string, init?: RequestInit) => {
+  const url = employeeId
+    ? `${buildUrl('summary-sales')}?employeeId=${employeeId}`
+    : buildUrl('summary-sales');
+  return sendRequestWithLimit<SummarySales[]>(url, init);
 };
 
 export const getCountries = (init?: RequestInit) => {
   return sendRequestWithLimit<Country[]>(buildUrl('countries'), init);
 };
 
-export const getCountriesWithCompanyCounts = async (init?: RequestInit) => {
-  return sendRequestWithLimit<CountryWithCompanyCount[]>(
-    buildUrl('countries', 'with-companies'),
-    init,
-  );
+export const getCountriesWithCompanyCounts = async (employeeId?: string, init?: RequestInit) => {
+  const url = employeeId
+    ? `${buildUrl('countries', 'with-companies')}?employeeId=${employeeId}`
+    : buildUrl('countries', 'with-companies');
+  return sendRequestWithLimit<CountryWithCompanyCount[]>(url, init);
 };
 
-export const getCategoriesCounts = async (init?: RequestInit) => {
-  return sendRequestWithLimit<CountryWithCategoriesCount[]>(
-    buildUrl('categories', 'with-companies'),
-    init, 
-  )
+export const getCategoriesCounts = async (employeeId?: string, init?: RequestInit) => {
+  const url = employeeId
+    ? `${buildUrl('categories', 'with-companies')}?employeeId=${employeeId}`
+    : buildUrl('categories', 'with-companies');
+  return sendRequestWithLimit<CountryWithCategoriesCount[]>(url, init);
 }
 
 export const getCategories = async (init?: RequestInit): Promise<Category[]> => {
@@ -237,7 +240,7 @@ export async function uploadDocuments(
 export const getCompanyDocuments = async (
   companyId: string
 ): Promise<CompanyDocument[]> => {
-  const response = await fetch(`http://localhost:3000/api/documents/company/${companyId}`);
+  const response = await fetch(buildUrl('documents', 'company', companyId));
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -248,15 +251,19 @@ export const getCompanyDocuments = async (
 };
 
 export const deleteDocument = async (filename: string) => {
-  const res = await fetch(`/documents/${filename}`, { method: 'DELETE' });
+  const res = await fetch(buildUrl('documents', filename), { method: 'DELETE' });
   if (!res.ok) throw new Error('Помилка при видаленні файлу');
 };
 
 export const createCompany = async (
   data: Omit<Company, 'id' | 'hasPromotions'>,
+  employeeId?: string,
   init?: RequestInit,
 ) => {
-  return sendRequestWithLimit<Company>(buildUrl('company'), {
+  const url = employeeId
+    ? `${buildUrl('company')}?employeeId=${employeeId}`
+    : buildUrl('company');
+  return sendRequestWithLimit<Company>(url, {
     ...init,
     method: 'POST',
     body: JSON.stringify(data),
@@ -267,8 +274,11 @@ export const createCompany = async (
   });
 };
 
-export const getCompanies = (init?: RequestInit) => {
-  return sendRequestWithLimit<Company[]>(buildUrl('company'), init);
+export const getCompanies = (employeeId?: string, init?: RequestInit) => {
+  const url = employeeId 
+    ? `${buildUrl('company')}?employeeId=${employeeId}`
+    : buildUrl('company');
+  return sendRequestWithLimit<Company[]>(url, init);
 };
 
 export const getCompany = (id: string, init?: RequestInit) => {
