@@ -1,3 +1,5 @@
+const PRODUCTION_API_FALLBACK = 'https://api-yho4.onrender.com';
+
 export function getApiOrigin(): string {
   const url = (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/$/, '');
   if (url) {
@@ -5,7 +7,7 @@ export function getApiOrigin(): string {
   }
 
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('NEXT_PUBLIC_API_URL or API_URL is required in production');
+    return PRODUCTION_API_FALLBACK;
   }
 
   return 'http://127.0.0.1:3000';
