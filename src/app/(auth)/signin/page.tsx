@@ -1,10 +1,10 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useState, FormEvent } from 'react';
+import { Suspense, useEffect, useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Shield,
   Mail,
@@ -61,13 +61,39 @@ function BrandMark() {
   );
 }
 
-export default function SignIn() {
+function SignInContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const authError = searchParams.get('error');
+
+    if (authError === 'AccessDenied') {
+      setError(
+        'GitHub access denied. Add your GitHub email to GITHUB_ADMIN_EMAILS on Vercel, or create an admin user with the same email in the database.',
+      );
+      return;
+    }
+
+    if (authError === 'Configuration') {
+      setError('Authentication is misconfigured. Check GITHUB_ID, GITHUB_SECRET and NEXTAUTH_URL on Vercel.');
+      return;
+    }
+
+    if (authError === 'OAuthCallback') {
+      setError('GitHub callback failed. Verify the OAuth callback URL in your GitHub app settings.');
+      return;
+    }
+
+    if (authError) {
+      setError('Sign in failed. Please try again.');
+    }
+  }, [searchParams]);
 
   const handleCredentialsSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -285,5 +311,19 @@ export default function SignIn() {
         </footer>
       </div>
     </main>
+  );
+}
+
+export default function SignIn() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-black text-white">
+          Loading...
+        </main>
+      }
+    >
+      <SignInContent />
+    </Suspense>
   );
 }

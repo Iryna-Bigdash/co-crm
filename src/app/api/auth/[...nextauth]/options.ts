@@ -4,11 +4,43 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { GithubProfile } from 'next-auth/providers/github';
 import { getApiHeaders, getApiOrigin, getAuthRequestTimeoutMs } from '@/lib/config';
 
+interface BackendEmployee {
+  id: string;
+  email: string;
+  role: string;
+}
+
 function getAllowedGithubEmails(): string[] {
   return (process.env.GITHUB_ADMIN_EMAILS || '')
     .split(',')
     .map((email) => email.trim().toLowerCase())
     .filter(Boolean);
+}
+
+async function findBackendEmployeeByEmail(email: string): Promise<BackendEmployee | null> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), getAuthRequestTimeoutMs());
+
+  try {
+    const response = await fetch(`${getApiOrigin()}/api/employees`, {
+      headers: getApiHeaders() as Record<string, string>,
+      signal: controller.signal,
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const employees = (await response.json()) as BackendEmployee[];
+    return (
+      employees.find((employee) => employee.email.toLowerCase() === email) ?? null
+    );
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export const options: NextAuthOptions = {
@@ -113,18 +145,28 @@ export const options: NextAuthOptions = {
         return true;
       }
 
-      const allowedEmails = getAllowedGithubEmails();
       const email = user.email?.toLowerCase();
-
-      if (process.env.NODE_ENV === 'production' && allowedEmails.length === 0) {
+      if (!email) {
         return false;
       }
 
-      if (allowedEmails.length > 0 && (!email || !allowedEmails.includes(email))) {
-        return false;
+      const allowedEmails = getAllowedGithubEmails();
+      if (allowedEmails.includes(email)) {
+        return true;
       }
 
-      return true;
+      const employee = await findBackendEmployeeByEmail(email);
+      if (employee && ['ADMIN', 'MANAGER'].includes(employee.role)) {
+        user.id = employee.id;
+        user.role = employee.role.toLowerCase();
+        return true;
+      }
+
+      if (process.env.NODE_ENV !== 'production') {
+        return true;
+      }
+
+      return false;
     },
     async jwt({ token, user }) {
       if (user) {
