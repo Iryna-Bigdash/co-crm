@@ -1,14 +1,23 @@
 export function getApiOrigin(): string {
-  const url = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+  const url = (process.env.API_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/$/, '');
   if (url) {
     return url;
   }
 
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('NEXT_PUBLIC_API_URL is required in production');
+    throw new Error('NEXT_PUBLIC_API_URL or API_URL is required in production');
   }
 
   return 'http://127.0.0.1:3000';
+}
+
+export function getAuthRequestTimeoutMs(): number {
+  const fromEnv = Number(process.env.AUTH_REQUEST_TIMEOUT_MS);
+  if (Number.isFinite(fromEnv) && fromEnv > 0) {
+    return fromEnv;
+  }
+
+  return process.env.NODE_ENV === 'production' ? 120_000 : 8_000;
 }
 
 export function getApiBaseUrl(): string {

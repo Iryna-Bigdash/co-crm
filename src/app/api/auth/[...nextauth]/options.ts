@@ -2,7 +2,7 @@ import { NextAuthOptions } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { GithubProfile } from 'next-auth/providers/github';
-import { getApiHeaders, getApiOrigin } from '@/lib/config';
+import { getApiHeaders, getApiOrigin, getAuthRequestTimeoutMs } from '@/lib/config';
 
 function getAllowedGithubEmails(): string[] {
   return (process.env.GITHUB_ADMIN_EMAILS || '')
@@ -50,30 +50,35 @@ export const options: NextAuthOptions = {
         },
       },
       async authorize(credentials) {
+        const email = credentials?.username?.trim();
+        const password = credentials?.password?.trim();
+
+        if (!email || !password) {
+          throw new Error('Email and password are required');
+        }
+
+        const controller = new AbortController();
+        const timeoutMs = getAuthRequestTimeoutMs();
+        const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
         try {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 8000);
-
-          const email = credentials?.username?.trim();
-          const password = credentials?.password?.trim();
-
           const response = await fetch(`${getApiOrigin()}/api/employees/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              ...getApiHeaders(),
+              ...(getApiHeaders() as Record<string, string>),
             },
-            body: JSON.stringify({
-              email,
-              password,
-            }),
+            body: JSON.stringify({ email, password }),
             signal: controller.signal,
+            cache: 'no-store',
           });
 
-          clearTimeout(timeout);
+          if (response.status === 401) {
+            return null;
+          }
 
           if (!response.ok) {
-            return null;
+            throw new Error('Authentication service is unavailable. Please try again.');
           }
 
           const employee = await response.json();
@@ -84,8 +89,20 @@ export const options: NextAuthOptions = {
             email: employee.email,
             role: employee.role.toLowerCase(),
           };
-        } catch {
-          return null;
+        } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            throw new Error(
+              'Server is waking up. Wait about a minute and try again.',
+            );
+          }
+
+          if (error instanceof Error && error.message) {
+            throw error;
+          }
+
+          throw new Error('Unable to connect to authentication service.');
+        } finally {
+          clearTimeout(timeout);
         }
       },
     }),

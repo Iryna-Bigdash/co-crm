@@ -82,7 +82,11 @@ export default function SignIn() {
       });
 
       if (result?.error) {
-        setError('Invalid credentials. Please try again.');
+        setError(
+          result.error === 'CredentialsSignin'
+            ? 'Invalid credentials. Please try again.'
+            : result.error,
+        );
         setIsLoading(false);
       } else {
         router.push('/dashboard');
