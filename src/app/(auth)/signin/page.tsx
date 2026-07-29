@@ -54,7 +54,7 @@ function BrandMark() {
         </svg>
       </div>
       <div className="text-center">
-        <p className="text-lg font-semibold tracking-[0.35em] text-white">TRUSCAPE</p>
+        <p className="text-lg font-semibold tracking-[0.2em] text-white">IREN CORE</p>
         <p className="mt-1 text-[10px] tracking-[0.45em] text-[#C5A059]/90">CRM PLATFORM</p>
       </div>
     </div>
@@ -304,7 +304,7 @@ function SignInContent() {
               </span>
             </div>
             <p className="text-center sm:flex-1">
-              © {new Date().getFullYear()} TruScape CRM. All rights reserved.
+              © {new Date().getFullYear()} IREN CORE. All rights reserved.
             </p>
             <div className="flex items-center justify-center gap-5 sm:justify-end">
               <Link href="/" className="transition hover:text-white/75">
