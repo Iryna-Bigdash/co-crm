@@ -1,4 +1,5 @@
 import { limiter } from './config/limiter';
+import { getApiBaseUrl, withApiAuth } from './config';
 
 export interface SummaryStats {
   promotions: number;
@@ -94,34 +95,47 @@ export interface InteractionsListResponse {
   take: number;
 }
 
+export interface CalendarInteraction extends Interaction {
+  companyTitle: string;
+}
+
+export interface Employee {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt?: string;
+  updatedAT?: string;
+}
+
 interface CompanyDocument {
   filename: string;
   url: string;
 }
 
-const PROJECT_TOKEN = process.env.NEXT_PUBLIC_PROJECT_TOKEN;
-
-const newLocal = (...paths: string[]) => {
-  const isDevelopment = process.env.NODE_ENV === 'development';
-
-  const baseUrl = isDevelopment
-    ? 'http://localhost:3000/api' // Локальна база даних для режиму розробки
-    : 'https://api-yho4.onrender.com/api'; // Віддалена база даних для продакшену
-
-  return `${baseUrl}/${paths.join('/')}`;
-};
-
-// const buildUrl = (...paths: string[]) =>
-//   `http://localhost:3000/api/${paths.join('/')}`;
-
-// const buildUrl = (...paths: string[]) =>
-//   `https://api-yho4.onrender.com/api/${paths.join('/')}`;
-
-const buildUrl = newLocal;
-
+const buildUrl = (...paths: string[]) =>
+  `${getApiBaseUrl()}/${paths.join('/')}`;
 
 const stringifyQueryParams = (params: Record<string, string>) =>
   new URLSearchParams(params).toString();
+
+const parseApiError = async (response: Response) => {
+  const errorText = await response.text();
+
+  try {
+    const parsed = JSON.parse(errorText) as { message?: string | string[] };
+    if (Array.isArray(parsed.message)) {
+      return parsed.message.join(', ');
+    }
+    if (parsed.message) {
+      return parsed.message;
+    }
+  } catch {
+    // keep raw text
+  }
+
+  return errorText || 'Request failed';
+};
 
 const sendRequestWithLimit = async <T>(
   url: string,
@@ -129,17 +143,14 @@ const sendRequestWithLimit = async <T>(
 ): Promise<T> => {
   const remainingTokens = await limiter.removeTokens(1);
 
-  // console.log('remainingTokens', remainingTokens);
-
   if (remainingTokens < 0) {
     throw new Error('Rate limit exceeded');
   }
 
-  const res = await fetch(url, init);
+  const res = await fetch(url, withApiAuth(init));
 
   if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText);
+    throw new Error(await parseApiError(res));
   }
 
   return res.json() as Promise<T>;
@@ -193,10 +204,10 @@ export async function uploadFile(file: File, companyTitle: string): Promise<stri
   formData.append('companyTitle', companyTitle);
 
   const url = buildUrl('upload');
-  const response = await fetch(url, {
+  const response = await fetch(url, withApiAuth({
     method: 'POST',
     body: formData,
-  });
+  }));
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -204,8 +215,6 @@ export async function uploadFile(file: File, companyTitle: string): Promise<stri
   }
 
   const data = await response.json();
-  console.log('data:', data);
-  console.log('data URL:', data.path)
   return data.path;
 }
 
@@ -223,10 +232,10 @@ export async function uploadDocuments(
 
   const url = buildUrl('documents');
 
-  const response = await fetch(url, {
+  const response = await fetch(url, withApiAuth({
     method: 'POST',
     body: formData,
-  });
+  }));
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -240,7 +249,7 @@ export async function uploadDocuments(
 export const getCompanyDocuments = async (
   companyId: string
 ): Promise<CompanyDocument[]> => {
-  const response = await fetch(buildUrl('documents', 'company', companyId));
+  const response = await fetch(buildUrl('documents', 'company', companyId), withApiAuth());
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -251,7 +260,7 @@ export const getCompanyDocuments = async (
 };
 
 export const deleteDocument = async (filename: string) => {
-  const res = await fetch(buildUrl('documents', filename), { method: 'DELETE' });
+  const res = await fetch(buildUrl('documents', filename), withApiAuth({ method: 'DELETE' }));
   if (!res.ok) throw new Error('Помилка при видаленні файлу');
 };
 
@@ -425,8 +434,32 @@ export const getInteractionsForCompany = async (
   );
 };
 
+export const getCalendarInteractions = async (
+  params: {
+    employeeId?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    type?: InteractionType;
+    status?: InteractionStatus;
+  } = {},
+  init?: RequestInit,
+) => {
+  const query = Object.fromEntries(
+    Object.entries(params).filter(([, value]) => Boolean(value)),
+  ) as Record<string, string>;
+
+  const url = Object.keys(query).length
+    ? `${buildUrl('interactions')}?${stringifyQueryParams(query)}`
+    : buildUrl('interactions');
+
+  return sendRequestWithLimit<CalendarInteraction[]>(url, {
+    ...init,
+    cache: 'no-store',
+  });
+};
+
 export const deleteInteraction = async (id: string, init?: RequestInit) => {
-  return sendRequestWithLimit<Interaction>(buildUrl('Interactions', id), {
+  return sendRequestWithLimit<Interaction>(buildUrl('interactions', id), {
     ...init,
     method: 'DELETE',
     headers: {
@@ -434,4 +467,69 @@ export const deleteInteraction = async (id: string, init?: RequestInit) => {
     },
   });
 };
+
+export const getEmployees = (role?: string, init?: RequestInit) => {
+  const url = role
+    ? `${buildUrl('employees')}?role=${role}`
+    : buildUrl('employees');
+  return sendRequestWithLimit<Employee[]>(url, init);
+};
+
+export const createEmployee = (
+  data: { name: string; email: string; password: string; role: string },
+  init?: RequestInit,
+) =>
+  sendRequestWithLimit<Employee>(buildUrl('employees'), {
+    ...init,
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      ...(init?.headers || {}),
+      'Content-Type': 'application/json',
+    },
+  });
+
+export const updateEmployee = (
+  id: string,
+  data: { name?: string; email?: string; password?: string },
+  init?: RequestInit,
+) =>
+  sendRequestWithLimit<Employee>(buildUrl('employees', id), {
+    ...init,
+    method: 'PATCH',
+    body: JSON.stringify(data),
+    headers: {
+      ...(init?.headers || {}),
+      'Content-Type': 'application/json',
+    },
+  });
+
+export const deleteEmployee = (id: string, init?: RequestInit) =>
+  sendRequestWithLimit<Employee>(buildUrl('employees', id), {
+    ...init,
+    method: 'DELETE',
+  });
+
+export const getEmployeeCompanies = (employeeId: string, init?: RequestInit) =>
+  sendRequestWithLimit<Company[]>(buildUrl('employees', employeeId, 'companies'), init);
+
+export const assignCompanyToEmployee = (
+  employeeId: string,
+  companyId: string,
+  init?: RequestInit,
+) =>
+  sendRequestWithLimit(buildUrl('employees', employeeId, 'companies', companyId), {
+    ...init,
+    method: 'POST',
+  });
+
+export const unassignCompanyFromEmployee = (
+  employeeId: string,
+  companyId: string,
+  init?: RequestInit,
+) =>
+  sendRequestWithLimit(buildUrl('employees', employeeId, 'companies', companyId), {
+    ...init,
+    method: 'DELETE',
+  });
 

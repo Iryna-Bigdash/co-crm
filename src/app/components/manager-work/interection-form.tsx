@@ -1,55 +1,125 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { isToday } from 'date-fns';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { addDays, endOfDay, isToday, startOfDay } from 'date-fns';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
-import { createInteraction, type Interaction as ApiInteraction } from '@/lib/api';
+import {
+  buildOccupiedSlotKeys,
+  combineDateAndTime,
+  getExcludedTimesForDay,
+  isTimeSlotOccupied,
+} from '@/lib/calendar-slots';
+import {
+  createInteraction,
+  getCalendarInteractions,
+  type Interaction as ApiInteraction,
+} from '@/lib/api';
 
-type UIType   = 'call' | 'email' | 'meeting' | 'other';
+type UIType = 'call' | 'email' | 'meeting' | 'other';
 type UIStatus = 'pending' | 'done' | 'canceled' | 'callback';
 
-const schema = Yup.object({
-  type:    Yup.string().oneOf(['call','email','meeting','other']).required('Оберіть тип'),
-  status:  Yup.string().oneOf(['pending','done','canceled','callback']).required('Оберіть статус'),
-  comment: Yup.string().trim().required('Коментар обовʼязковий'),
-  nextCall:Yup.date().nullable().min(new Date(),'Не в минулому').required('Дата і час обовʼязкові'),
-  amount:  Yup.number().min(0,'Має бути ≥ 0').nullable()
-    .transform(v => (v === '' || isNaN(v) ? null : v)),
-});
+function toUpperEnum<T extends string>(v: T) {
+  return v.toUpperCase() as Uppercase<T>;
+}
 
-function toUpperEnum<T extends string>(v: T) { return v.toUpperCase() as Uppercase<T>; }
 function toIso(v?: Date | string | null) {
   if (v == null) return null;
   if (v instanceof Date) return v.toISOString();
   return new Date(v).toISOString();
 }
 
+function schedulesCalendarEvent(status: UIStatus | '') {
+  return status === 'pending' || status === 'callback';
+}
+
 export default function InteractionForm({ companyId }: { companyId: string }) {
   const qc = useQueryClient();
+  const { data: session } = useSession();
+
+  const employeeId =
+    session?.user?.role === 'manager' ? session.user.id : undefined;
+
+  const dateFrom = useMemo(() => startOfDay(new Date()).toISOString(), []);
+  const dateTo = useMemo(() => endOfDay(addDays(new Date(), 90)).toISOString(), []);
+
+  const { data: calendarEvents = [] } = useQuery({
+    queryKey: ['interactions', 'calendar', 'occupied-slots', employeeId, dateFrom, dateTo],
+    queryFn: () =>
+      getCalendarInteractions({
+        employeeId,
+        dateFrom,
+        dateTo,
+        status: 'PENDING',
+      }),
+    enabled: Boolean(session?.user),
+    staleTime: 30_000,
+  });
+
+  const occupiedSlots = useMemo(
+    () => buildOccupiedSlotKeys(calendarEvents),
+    [calendarEvents],
+  );
+
+  const validationSchema = useMemo(
+    () =>
+      Yup.object({
+        type: Yup.string()
+          .oneOf(['call', 'email', 'meeting', 'other'])
+          .required('Оберіть тип'),
+        status: Yup.string()
+          .oneOf(['pending', 'done', 'canceled', 'callback'])
+          .required('Оберіть статус'),
+        comment: Yup.string().trim().required('Коментар обовʼязковий'),
+        nextCall: Yup.date()
+          .nullable()
+          .min(new Date(), 'Не в минулому')
+          .required('Дата і час обовʼязкові')
+          .test('occupied-slot', 'Цей час уже зайнятий іншою подією', function (value) {
+            const status = this.parent.status as UIStatus | '';
+            if (!value || !schedulesCalendarEvent(status)) return true;
+            return !isTimeSlotOccupied(value, occupiedSlots);
+          }),
+        amount: Yup.number()
+          .min(0, 'Має бути ≥ 0')
+          .nullable()
+          .transform((value) => (value === '' || isNaN(value) ? null : value)),
+      }),
+    [occupiedSlots],
+  );
 
   const mutation = useMutation({
     mutationFn: async (values: {
-      type: UIType | ''; status: UIStatus | '';
-      comment: string; nextCall: Date | null; amount: number | null;
+      type: UIType | '';
+      status: UIStatus | '';
+      comment: string;
+      nextCall: Date | null;
+      amount: number | null;
     }) => {
-      const payload: Omit<ApiInteraction,'id'|'companyId'|'createdAt'|'updatedAt'> = {
-        type:     toUpperEnum(values.type as UIType) as ApiInteraction['type'],       // → CALL/EMAIL/...
-        status:   toUpperEnum(values.status as UIStatus) as ApiInteraction['status'], // → PENDING/DONE/...
-        date:     new Date().toISOString(),
-        comment:  values.comment.trim(),
+      const payload: Omit<
+        ApiInteraction,
+        'id' | 'companyId' | 'createdAt' | 'updatedAt'
+      > = {
+        type: toUpperEnum(values.type as UIType) as ApiInteraction['type'],
+        status: (values.status === 'callback'
+          ? 'PENDING'
+          : toUpperEnum(values.status as Exclude<UIStatus, 'callback'>)) as ApiInteraction['status'],
+        date: new Date().toISOString(),
+        comment: values.comment.trim(),
         nextCall: toIso(values.nextCall),
-        amount:   values.amount,
+        amount: values.amount,
       };
       return createInteraction(companyId, payload);
     },
     onSuccess: () => {
       toast.success('Запис додано');
-      qc.invalidateQueries({ queryKey: ['interactions','company', companyId] });
+      qc.invalidateQueries({ queryKey: ['interactions', 'company', companyId] });
+      qc.invalidateQueries({ queryKey: ['interactions', 'calendar'] });
       qc.invalidateQueries({ queryKey: ['company', companyId] });
     },
     onError: (e: any) => toast.error(e?.message || 'Не вдалося додати запис'),
@@ -63,19 +133,48 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
       nextCall: null as Date | null,
       amount: null as number | null,
     },
-    validationSchema: schema,
+    validationSchema,
     onSubmit: (vals) => mutation.mutate(vals),
   });
 
   const minDate = new Date();
+  const selectedDay = formik.values.nextCall ?? minDate;
   const minTime =
     formik.values.nextCall && isToday(formik.values.nextCall)
       ? new Date()
       : new Date(new Date().setHours(0, 0, 0, 0));
   const maxTime = new Date(new Date().setHours(23, 45, 0, 0));
 
+  const excludeTimes = useMemo(
+    () =>
+      schedulesCalendarEvent(formik.values.status)
+        ? getExcludedTimesForDay(calendarEvents, selectedDay)
+        : [],
+    [calendarEvents, formik.values.status, selectedDay],
+  );
+
+  const filterTime = useCallback(
+    (time: Date) => {
+      const candidate = combineDateAndTime(selectedDay, time);
+
+      if (isToday(candidate) && candidate.getTime() < Date.now()) {
+        return false;
+      }
+
+      if (!schedulesCalendarEvent(formik.values.status)) {
+        return true;
+      }
+
+      return !isTimeSlotOccupied(candidate, occupiedSlots);
+    },
+    [formik.values.status, occupiedSlots, selectedDay],
+  );
+
   return (
-    <form onSubmit={formik.handleSubmit} className="mb-8 p-4 border rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 shadow-sm">
+    <form
+      onSubmit={formik.handleSubmit}
+      className="mb-8 p-4 border rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 shadow-sm"
+    >
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
         <div>
           <select
@@ -100,7 +199,13 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
           <select
             name="status"
             value={formik.values.status}
-            onChange={formik.handleChange}
+            onChange={(event) => {
+              formik.handleChange(event);
+              if (formik.values.nextCall) {
+                formik.setFieldTouched('nextCall', true, false);
+                formik.validateField('nextCall');
+              }
+            }}
             onBlur={formik.handleBlur}
             className="border rounded-lg px-3 py-2 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
           >
@@ -118,7 +223,12 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
         <div className="sm:col-span-2">
           <DatePicker
             selected={formik.values.nextCall}
-            onChange={(d) => formik.setFieldValue('nextCall', d)}
+            onChange={(date) => {
+              formik.setFieldValue('nextCall', date);
+              if (date) {
+                formik.setFieldTouched('nextCall', true, false);
+              }
+            }}
             onBlur={formik.handleBlur}
             showTimeSelect
             timeFormat="HH:mm"
@@ -130,9 +240,17 @@ export default function InteractionForm({ companyId }: { companyId: string }) {
             minDate={minDate}
             minTime={minTime}
             maxTime={maxTime}
+            excludeTimes={excludeTimes}
+            filterTime={filterTime}
+            calendarClassName="interaction-date-picker"
           />
           {formik.touched.nextCall && formik.errors.nextCall && (
             <div className="text-red-500 text-sm mt-1">{formik.errors.nextCall as string}</div>
+          )}
+          {schedulesCalendarEvent(formik.values.status) && (
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Зайняті години відображаються неактивними
+            </p>
           )}
         </div>
       </div>

@@ -1,36 +1,30 @@
-// export { default } from "next-auth/middleware";
-// Ref: https://next-auth.js.org/configuration/nextjs#advanced-usage
-
 import { withAuth, NextRequestWithAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
 
 export default withAuth(
   function middleware(request: NextRequestWithAuth) {
-    // console.log('pathname:', request.nextUrl.pathname);
-    // console.log('token:', request.nextauth.token);
+    const role = request.nextauth.token?.role;
+    const pathname = request.nextUrl.pathname;
 
-    if (
-      request.nextUrl.pathname.startsWith('/dashboard/settings') &&
-      request.nextauth.token?.role !== 'admin'
-    ) {
-      return NextResponse.rewrite(
-        // new URL('/dashboard', request.url)
-        new URL('/denied', request.url),
-      );
+    if (pathname.startsWith('/dashboard/settings') && role !== 'admin') {
+      return NextResponse.rewrite(new URL('/denied', request.url));
     }
 
     if (
-      request.nextUrl.pathname.startsWith('/companies/new') &&
-      request.nextauth.token?.role !== 'admin' &&
-      request.nextauth.token?.role !== 'manager'
+      (pathname.startsWith('/managers') || pathname.startsWith('/manager-assignments')) &&
+      role !== 'admin'
     ) {
-      return NextResponse.rewrite(
-        // new URL('/companies', request.url)
-        new URL('/denied', request.url),
-      );
+      return NextResponse.rewrite(new URL('/denied', request.url));
+    }
+
+    if (
+      pathname.startsWith('/companies/new') &&
+      role !== 'admin' &&
+      role !== 'manager'
+    ) {
+      return NextResponse.rewrite(new URL('/denied', request.url));
     }
   },
-
   {
     callbacks: {
       authorized: ({ token }) => !!token,
@@ -40,11 +34,10 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    // '/dashboard',
-    '/dashboard/settings',
-    // '/companies',
-    // '/companies/:id*',
-    '/companies/new',
-    // '/companies/:id*/new-promotion',
+    '/dashboard/:path*',
+    '/companies/:path*',
+    '/managers/:path*',
+    '/manager-assignments/:path*',
+    '/calendar/:path*',
   ],
 };

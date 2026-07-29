@@ -82,6 +82,17 @@
     animation-delay: 4s;
   }
 
+  .interaction-date-picker .react-datepicker__time-list-item--disabled {
+    color: #9ca3af !important;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    opacity: 0.55;
+  }
+
+  .dark .interaction-date-picker .react-datepicker__time-list-item--disabled {
+    color: #6b7280 !important;
+  }
+
   /* @layer base {
     * {
       @apply border-border;

@@ -1,4 +1,17 @@
 /** @type {import('next').NextConfig} */
+
+function getUploadHostname() {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000';
+
+  try {
+    return new URL(apiUrl).hostname;
+  } catch {
+    return '127.0.0.1';
+  }
+}
+
+const uploadHostname = getUploadHostname();
+
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -21,8 +34,14 @@ const nextConfig = {
         pathname: '/uploads/**',
       },
       {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '3000',
+        pathname: '/uploads/**',
+      },
+      {
         protocol: 'https',
-        hostname: 'api-yho4.onrender.com',
+        hostname: uploadHostname,
         port: '',
         pathname: '/uploads/**',
       },
@@ -35,10 +54,7 @@ const nextConfig = {
       type: 'asset/resource',
     });
     return config;
-  }
+  },
 };
-  
 
 export default nextConfig;
-
-  

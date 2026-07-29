@@ -1,6 +1,7 @@
  'use client'
 import React from 'react';
 import Sidebar from '@/app/components/sidebar';
+import InteractionReminderPopup from '@/app/components/calendar/interaction-reminder-popup';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 
@@ -23,6 +24,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <>
       <Sidebar />
+      <InteractionReminderPopup />
       <div className="ml-0 lg:ml-60 bg-white dark:bg-gray-950 min-h-screen transition-colors">{children}</div>
     </>
   );

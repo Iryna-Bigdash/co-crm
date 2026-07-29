@@ -10,13 +10,13 @@ import Button from '@/app/components/button';
 import Modal from '@/app/components/modal';
 import ManagerForm from '@/app/components/manager-form';
 import ReassignCompaniesModal from '@/app/components/reassign-companies-modal';
-
-interface Manager {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
+import {
+  createEmployee,
+  deleteEmployee,
+  getEmployees,
+  updateEmployee,
+  type Employee,
+} from '@/lib/api';
 
 interface ManagerFormValues {
   name: string;
@@ -28,42 +28,26 @@ export default function ManagersPage() {
   const { data: session } = useSession({ required: true });
   const queryClient = useQueryClient();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingManager, setEditingManager] = useState<Manager | null>(null);
-  const [reassigningManager, setReassigningManager] = useState<Manager | null>(null);
+  const [editingManager, setEditingManager] = useState<Employee | null>(null);
+  const [reassigningManager, setReassigningManager] = useState<Employee | null>(null);
   const [createdPassword, setCreatedPassword] = useState<{ name: string; email: string; password: string } | null>(null);
   
   if (session?.user?.role !== 'admin') {
     redirect('/dashboard');
   }
 
-  const apiUrl = process.env.NODE_ENV === 'production'
-    ? 'https://api-yho4.onrender.com/api'
-    : 'http://localhost:3000/api';
-
-  const { data: managers = [], isLoading } = useQuery<Manager[]>({
+  const { data: managers = [], isLoading } = useQuery<Employee[]>({
     queryKey: ['employees', 'MANAGER'],
-    queryFn: async () => {
-      const res = await fetch(`${apiUrl}/employees?role=MANAGER`);
-      if (!res.ok) throw new Error('Failed to fetch managers');
-      return res.json();
-    }
+    queryFn: () => getEmployees('MANAGER'),
   });
 
   const createMutation = useMutation({
     mutationFn: async (values: ManagerFormValues) => {
-      const res = await fetch(`${apiUrl}/employees`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...values,
-          role: 'MANAGER'
-        }),
+      const employee = await createEmployee({
+        ...values,
+        role: 'MANAGER',
       });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to create manager');
-      }
-      return { employee: await res.json(), password: values.password };
+      return { employee, password: values.password };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['employees', 'MANAGER'] });
@@ -82,7 +66,7 @@ export default function ManagersPage() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, values }: { id: string; values: ManagerFormValues }) => {
-      const updateData: any = {
+      const updateData: { name: string; email: string; password?: string } = {
         name: values.name,
         email: values.email,
       };
@@ -91,18 +75,10 @@ export default function ManagersPage() {
         updateData.password = values.password;
       }
 
-      const res = await fetch(`${apiUrl}/employees/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData),
-      });
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to update manager');
-      }
-      return { employee: await res.json(), password: values.password };
+      const employee = await updateEmployee(id, updateData);
+      return { employee, password: values.password };
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['employees', 'MANAGER'] });
       
       if (data.password) {
@@ -127,13 +103,7 @@ export default function ManagersPage() {
   };
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await fetch(`${apiUrl}/employees/${id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error('Failed to delete manager');
-      return res.json();
-    },
+    mutationFn: (id: string) => deleteEmployee(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employees', 'MANAGER'] });
       queryClient.invalidateQueries({ queryKey: ['assignments'] });
@@ -181,37 +151,36 @@ export default function ManagersPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors">
                   Email
                 </th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors">
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider transition-colors">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 transition-colors">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {managers.map((manager) => (
-                <tr key={manager.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <tr key={manager.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                     {manager.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {manager.email}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                    <button
-                      onClick={() => setReassigningManager(manager)}
-                      className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300 mr-4 transition-colors"
-                    >
-                      Reassign
-                    </button>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                     <button
                       onClick={() => setEditingManager(manager)}
-                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4 transition-colors"
+                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
                     >
                       Edit
                     </button>
                     <button
+                      onClick={() => setReassigningManager(manager)}
+                      className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300 transition-colors"
+                    >
+                      Reassign
+                    </button>
+                    <button
                       onClick={() => handleDelete(manager.id, manager.name)}
                       className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                      disabled={deleteMutation.isPending}
                     >
                       Delete
                     </button>
@@ -220,15 +189,8 @@ export default function ManagersPage() {
               ))}
             </tbody>
           </table>
-          
-          {managers.length === 0 && (
-            <div className="text-center py-10 text-gray-500 dark:text-gray-400">
-              No managers found. Create your first manager to get started.
-            </div>
-          )}
         </div>
 
-        {/* Create Modal */}
         <Modal
           show={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
@@ -240,7 +202,6 @@ export default function ManagersPage() {
           />
         </Modal>
 
-        {/* Edit Modal */}
         <Modal
           show={!!editingManager}
           onClose={() => setEditingManager(null)}
@@ -260,7 +221,6 @@ export default function ManagersPage() {
           )}
         </Modal>
 
-        {/* Reassign Modal */}
         {reassigningManager && (
           <ReassignCompaniesModal
             show={!!reassigningManager}
@@ -269,7 +229,6 @@ export default function ManagersPage() {
           />
         )}
 
-        {/* Password Display Modal */}
         <Modal
           show={!!createdPassword}
           onClose={() => setCreatedPassword(null)}
@@ -279,7 +238,7 @@ export default function ManagersPage() {
             <div className="space-y-4">
               <div className="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4 transition-colors">
                 <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium mb-2">
-                  ⚠️ Important: Save these credentials now!
+                  Important: Save these credentials now!
                 </p>
                 <p className="text-xs text-yellow-700 dark:text-yellow-300">
                   The password will only be shown once. Make sure to copy it before closing this window.
@@ -306,7 +265,7 @@ export default function ManagersPage() {
                     className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm transition-colors"
                     title="Copy email"
                   >
-                    📋 Copy
+                    Copy
                   </button>
                 </div>
               </div>
@@ -322,15 +281,9 @@ export default function ManagersPage() {
                     className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm transition-colors"
                     title="Copy password"
                   >
-                    📋 Copy
+                    Copy
                   </button>
                 </div>
-              </div>
-
-              <div className="flex justify-end pt-4">
-                <Button onClick={() => setCreatedPassword(null)}>
-                  I&apos;ve saved the credentials
-                </Button>
               </div>
             </div>
           )}

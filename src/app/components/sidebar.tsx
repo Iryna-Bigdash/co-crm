@@ -94,7 +94,7 @@ export default function Sidebar({}: SidebarProps) {
           />
           <ul className="space-y-7">
             <SidebarItem
-              current={pathname === '/dashboard'}
+              current={pathname === '/dashboard' || pathname.startsWith('/dashboard/')}
               pathname="/dashboard"
               src="/icons/squares.svg"
               alt="dashboard icon"
@@ -102,13 +102,23 @@ export default function Sidebar({}: SidebarProps) {
               Dashboard
             </SidebarItem>
             <SidebarItem
-              current={pathname === '/companies'}
+              current={pathname === '/companies' || pathname.startsWith('/companies/')}
               pathname="/companies"
               src="/icons/briefcase.svg"
               alt="companies icon"
             >
               Companies
             </SidebarItem>
+            {(session?.user?.role === 'admin' || session?.user?.role === 'manager') && (
+              <SidebarItem
+                current={pathname === '/calendar'}
+                pathname="/calendar"
+                src="/icons/calendar.svg"
+                alt="calendar icon"
+              >
+                Calendar
+              </SidebarItem>
+            )}
             {session?.user?.role === 'admin' && (
               <>
                 <SidebarItem

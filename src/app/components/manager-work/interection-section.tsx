@@ -25,6 +25,7 @@ export default function InteractionSection({ companyId }: { companyId: string })
     onSuccess: () => {
       toast.success('Запис видалено');
       queryClient.invalidateQueries({ queryKey: ['interactions', 'company', companyId] });
+      queryClient.invalidateQueries({ queryKey: ['interactions', 'calendar'] });
     },
     onError: (e: any) => {
       console.error(e);

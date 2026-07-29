@@ -5,23 +5,19 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import Modal from './modal';
 import Button from './button';
-
-interface Manager {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface Company {
-  id: string;
-  title: string;
-  categoryTitle: string;
-}
+import {
+  assignCompanyToEmployee,
+  getEmployeeCompanies,
+  getEmployees,
+  unassignCompanyFromEmployee,
+  type Company,
+  type Employee,
+} from '@/lib/api';
 
 interface ReassignCompaniesModalProps {
   show: boolean;
   onClose: () => void;
-  fromManager: Manager;
+  fromManager: Employee;
 }
 
 export default function ReassignCompaniesModal({ 
@@ -33,29 +29,17 @@ export default function ReassignCompaniesModal({
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [targetManagerId, setTargetManagerId] = useState<string>('');
 
-  const apiUrl = process.env.NODE_ENV === 'production'
-    ? 'https://api-yho4.onrender.com/api'
-    : 'http://localhost:3000/api';
-
-  // Get assigned companies for the source manager
   const { data: assignedCompanies = [], isLoading: loadingCompanies } = useQuery<Company[]>({
     queryKey: ['employees', fromManager.id, 'companies'],
-    queryFn: async () => {
-      const res = await fetch(`${apiUrl}/employees/${fromManager.id}/companies`);
-      if (!res.ok) throw new Error('Failed to fetch assigned companies');
-      return res.json();
-    },
+    queryFn: () => getEmployeeCompanies(fromManager.id),
     enabled: show,
   });
 
-  // Get all managers except the source manager
-  const { data: managers = [], isLoading: loadingManagers } = useQuery<Manager[]>({
+  const { data: managers = [], isLoading: loadingManagers } = useQuery<Employee[]>({
     queryKey: ['employees', 'MANAGER', 'exclude', fromManager.id],
     queryFn: async () => {
-      const res = await fetch(`${apiUrl}/employees?role=MANAGER`);
-      if (!res.ok) throw new Error('Failed to fetch managers');
-      const allManagers = await res.json();
-      return allManagers.filter((m: Manager) => m.id !== fromManager.id);
+      const allManagers = await getEmployees('MANAGER');
+      return allManagers.filter((manager) => manager.id !== fromManager.id);
     },
     enabled: show,
   });
@@ -65,21 +49,17 @@ export default function ReassignCompaniesModal({
       if (!targetManagerId) throw new Error('Please select a target manager');
       if (selectedCompanies.length === 0) throw new Error('Please select at least one company');
 
-      // First unassign from source manager, then assign to target manager
       await Promise.all(
         selectedCompanies.map(async (companyId) => {
-          // Unassign from source
-          await fetch(`${apiUrl}/employees/${fromManager.id}/companies/${companyId}`, {
-            method: 'DELETE',
-          });
-          
-          // Assign to target
-          const res = await fetch(`${apiUrl}/employees/${targetManagerId}/companies/${companyId}`, {
-            method: 'POST',
-          });
-          if (!res.ok && res.status !== 409) {
-            // 409 means already assigned, which is fine
-            throw new Error('Failed to reassign company');
+          await unassignCompanyFromEmployee(fromManager.id, companyId);
+
+          try {
+            await assignCompanyToEmployee(targetManagerId, companyId);
+          } catch (error) {
+            const message = error instanceof Error ? error.message : '';
+            if (!message.includes('already assigned')) {
+              throw error;
+            }
           }
         })
       );
@@ -126,7 +106,6 @@ export default function ReassignCompaniesModal({
               </div>
             ) : (
               <>
-                {/* Target Manager Selection */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Reassign to Manager *
@@ -145,7 +124,6 @@ export default function ReassignCompaniesModal({
                   </select>
                 </div>
 
-                {/* Company Selection */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -184,7 +162,6 @@ export default function ReassignCompaniesModal({
                   </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex gap-3 pt-4">
                   <Button
                     onClick={() => reassignMutation.mutate()}
