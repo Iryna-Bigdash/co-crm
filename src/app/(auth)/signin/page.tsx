@@ -73,9 +73,16 @@ function SignInContent() {
   useEffect(() => {
     const authError = searchParams.get('error');
 
+    if (authError === 'NoEmail') {
+      setError(
+        'GitHub did not share your email. Make your primary email public in GitHub settings, or use email/password login.',
+      );
+      return;
+    }
+
     if (authError === 'AccessDenied') {
       setError(
-        'GitHub access denied. Add your GitHub email to GITHUB_ADMIN_EMAILS on Vercel, or create an admin user with the same email in the database.',
+        'GitHub access denied. Add your GitHub email to GITHUB_ADMIN_EMAILS on Vercel, or use an employee account with the same email in the database.',
       );
       return;
     }

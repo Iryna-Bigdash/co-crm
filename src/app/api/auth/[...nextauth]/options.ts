@@ -46,6 +46,7 @@ async function findBackendEmployeeByEmail(email: string): Promise<BackendEmploye
 export const options: NextAuthOptions = {
   pages: {
     signIn: '/signin',
+    error: '/signin',
   },
   theme: {
     colorScheme: 'dark',
@@ -140,33 +141,50 @@ export const options: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (account?.provider !== 'github') {
         return true;
       }
 
-      const email = user.email?.toLowerCase();
+      const githubProfile = profile as GithubProfile | undefined;
+      const email = (
+        user.email ||
+        githubProfile?.email
+      )?.toLowerCase();
+
       if (!email) {
+        return '/signin?error=NoEmail';
+      }
+
+      user.email = email;
+
+      const allowedEmails = getAllowedGithubEmails();
+
+      if (allowedEmails.length > 0) {
+        if (allowedEmails.includes(email)) {
+          return true;
+        }
+
+        const employee = await findBackendEmployeeByEmail(email);
+        if (employee && ['ADMIN', 'MANAGER'].includes(employee.role)) {
+          user.id = employee.id;
+          user.role = employee.role.toLowerCase();
+          return true;
+        }
+
         return false;
       }
 
-      const allowedEmails = getAllowedGithubEmails();
-      if (allowedEmails.includes(email)) {
-        return true;
-      }
-
       const employee = await findBackendEmployeeByEmail(email);
-      if (employee && ['ADMIN', 'MANAGER'].includes(employee.role)) {
+      if (employee) {
         user.id = employee.id;
         user.role = employee.role.toLowerCase();
         return true;
       }
 
-      if (process.env.NODE_ENV !== 'production') {
-        return true;
-      }
-
-      return false;
+      // No allowlist configured: keep previous GitHub admin behavior.
+      user.role = 'admin';
+      return true;
     },
     async jwt({ token, user }) {
       if (user) {
